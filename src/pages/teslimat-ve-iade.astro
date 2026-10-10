@@ -1,0 +1,80 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LegalDoc from '../components/LegalDoc.astro';
+import { SITE } from '../data/site';
+const toc = [
+  { id: 'gonderim', label: 'Gönderim ve teslimat' },
+  { id: 'kargo', label: 'Kargo ücretleri' },
+  { id: 'cayma', label: 'Cayma hakkı ve iade şartları' },
+  { id: 'kabul-edilmeyen', label: 'İade kabul edilmeyen durumlar' },
+  { id: 'surec', label: 'İade süreci ve ücret iadesi' },
+];
+---
+
+<Layout title="Teslimat ve İade" description="Bizon Leather teslimat, kargo, cayma hakkı ve iade koşulları." page="legal">
+  <LegalDoc eyebrow="Teslimat · İade · Değişim" title="Teslimat & İade" toc={toc}>
+    <p>
+      Bizon Leather olarak, ürettiğimiz her bir el yapımı deri parçanın kusursuz bir kondisyon ve işçilikle size ulaşmasını hedefliyoruz.
+    </p>
+    <br />
+    <section id="gonderim">
+      <h2>1. Gönderim ve teslimat</h2>
+      <ul>
+        <li>
+          <strong>Hazırlık süreci:</strong> Siparişleriniz, ödeme onayından sonra 1–3 iş günü içerisinde özenle paketlenerek kargoya teslim edilir.
+          Özel el işçiliği veya kişiselleştirme gerektiren ürünlerde bu süre değişkenlik gösterebilir.
+        </li>
+        <li><strong>Teslimat süresi:</strong> Kargoya verildikten sonra, bulunduğunuz lokasyona bağlı olarak 1–5 iş günüdür.</li>
+        <li>
+          <strong>Teslimat kontrolü:</strong> Siparişinizi teslim alırken kargo paketini kontrol etmenizi önemle rica ederiz. Taşınma esnasında hasar
+          görmüş paketler için kargo görevlisine "Hasar Tespit Tutanağı" tutturarak paketi teslim almamanız gerekmektedir.
+        </li>
+        <li><strong>Takip:</strong> Siparişiniz kargoya verildiğinde SMS ve e-posta ile kargo takip numarası iletilir.</li>
+      </ul>
+    </section>
+    <section id="kargo">
+      <h2>2. Kargo ücretleri</h2>
+      <ul>
+        <li>Web sitemiz üzerinden verilen 3.000 TL ve üzeri siparişlerde Türkiye geneli kargo ücretsizdir.</li>
+        <li>Aksi belirtilmediği sürece kargo ücreti alıcıya aittir.</li>
+        <li>İade ve değişim süreçlerinde kargo gönderim bedeli alıcı tarafından karşılanır.</li>
+        <li>Üretim hatası veya kusurlu ürün gönderimi durumunda kargo ücreti Bizon Leather'a aittir.</li>
+        <li>Bizon Leather bünyesinde stok yenileme ücreti veya herhangi bir ek kesinti uygulanmaz.</li>
+      </ul>
+    </section>
+    <section id="cayma">
+      <h2>3. Cayma hakkı ve iade şartları</h2>
+      <p>
+        6502 sayılı Tüketicinin Korunması Hakkında Kanun uyarınca, siparişinizi teslim aldığınız tarihten itibaren 14 gün içerisinde herhangi bir
+        gerekçe göstermeksizin cayma hakkınızı kullanabilirsiniz. İadenin kabul edilmesi için:
+      </p>
+      <ul>
+        <li>Ürün; orijinal kutusunda/ambalajında, etiketleri sökülmemiş ve zarar görmemiş olmalıdır.</li>
+        <li>Ürün kullanılmamış, çizilmemiş, form bozulmasına uğramamış ve tekrar satılabilirlik özelliğini kaybetmemiş olmalıdır.</li>
+        <li>Ürün, tarafınıza ulaştığı koruyucu ambalaj ve aksesuarlarıyla birlikte eksiksiz gönderilmelidir.</li>
+      </ul>
+    </section>
+    <section id="kabul-edilmeyen">
+      <h2>4. İade kabul edilmeyen durumlar</h2>
+      <ul>
+        <li>
+          <strong>Kişiselleştirilmiş ürünler:</strong> Alıcının isteği doğrultusunda üzerine isim, harf, özel tarih veya logo basılan ya da özel ölçüde
+          üretilen ürünlerde mevzuat gereği iade ve değişim yapılmaz. Üretim kaynaklı bir kusur olması durumunda değişim sağlanır.
+        </li>
+        <li>Deri yüzeyinde kullanım emaresi, çizik, kırışma veya deformasyon oluşmuş ürünler.</li>
+        <li>Orijinal ambalajı, koruyucu kılıfı veya aksesuarları eksik gönderilen ürünler.</li>
+      </ul>
+    </section>
+    <section id="surec">
+      <h2>5. İade süreci ve ücret iadesi</h2>
+      <p>
+        İade talebinizi başlatmak için <a href={`mailto:${SITE.email}?subject=${encodeURIComponent('İade talebi')}`}>{SITE.email}</a> adresine
+        sipariş numaranız ve iade nedeninizle birlikte e-posta gönderin; adres ve kargo bilgileri size iletilir.
+      </p>
+      <p>
+        İade edilen ürün tarafımıza ulaşıp kalite kontrol sürecinden geçtikten sonra, iade şartlarına uygunluğu onaylanırsa 14 iş günü içerisinde
+        ödemeniz, kullandığınız ödeme yöntemi üzerinden kartınıza iade edilir.
+      </p>
+    </section>
+  </LegalDoc>
+</Layout>

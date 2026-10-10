@@ -1,0 +1,270 @@
+---
+import { url } from '../lib/url';
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import Atelier from '../components/home/Atelier.astro';
+import StitchDemo from '../components/StitchDemo.astro';
+import { img } from '../data/products';
+import { FAQ } from '../data/site';
+const care = FAQ.find((f) => f.group === 'Bakım')!.items;
+---
+
+<Layout
+  title="Atölye"
+  description="Bizon Leather, Eskişehir'deki atölyesinde %100 hakiki sığır derisinden el yapımı deri aksesuarlar üretir. Kesim, şekillendirme, dikiş ve perdah elde yapılır."
+  page="atelier"
+>
+  <section class="ab-hero" aria-labelledby="ab-title">
+    <div class="wrap ab-hero-grid">
+      <p class="label">Hakkımızda · Eskişehir, 2026</p>
+      <h1 id="ab-title" class="display d-xxl" data-reveal="lines">
+        <span class="ln"><span>Eskişehir'de,</span></span>
+        <span class="ln"><span class="thread-text">elde.</span></span>
+      </h1>
+    </div>
+    <figure class="ab-photo" data-reveal="cut">
+      <div class="ab-photo-inner" data-parallax="0.08">
+        <Image src={img('atolye')} alt="Bizon Leather atölye masası: deri ürünler, bıçaklar, iplik makaraları ve bakım kremi." widths={[800, 1293]} sizes="100vw" loading="eager" />
+      </div>
+    </figure>
+  </section>
+
+  <section class="ab-story wrap" aria-label="Hikâyemiz">
+    <div class="ab-col">
+      <p class="label">Bizon Leather hakkında</p>
+      <p class="ab-big" data-reveal="fade">
+        El yapımı premium deri ürünleri tasarlayan ve üreten bir Türk markasıyız. Her ürün, en kaliteli hammaddelerle, özenli işçilik isteyen
+        geleneksel yöntemlerle hayata geçer.
+      </p>
+    </div>
+    <dl class="ab-facts" data-reveal="stagger">
+      <div>
+        <dt class="mono">Kuruluş</dt>
+        <dd>2026, Eskişehir — iki arkadaşın ortak fikri</dd>
+      </div>
+      <div>
+        <dt class="mono">Üretim</dt>
+        <dd>Tasarımdan son dikişe kadar kendi atölyemizde, elde</dd>
+      </div>
+      <div>
+        <dt class="mono">Deri</dt>
+        <dd>%100 hakiki sığır derisi · Akgün Deri, İstanbul</dd>
+      </div>
+      <div>
+        <dt class="mono">Astar</dt>
+        <dd>Yok — ürünün tamamı deridir</dd>
+      </div>
+      <div>
+        <dt class="mono">Satış</dt>
+        <dd>Aracısız: web sitesi, Instagram ve WhatsApp destek hattı</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="ab-mission chalk" aria-labelledby="mission-title">
+    <div class="wrap mission-grid">
+      <p class="label">Misyonumuz</p>
+      <h2 id="mission-title" class="display d-l mission-text" data-reveal="lines">
+        <span class="ln"><span>Zamanla daha da</span></span>
+        <span class="ln"><span>güzelleşen, kalıcı</span></span>
+        <span class="ln"><span>ve kişisel deri.</span></span>
+      </h2>
+      <p class="mission-sub" data-reveal="fade">
+        Günlük yaşamınıza eşlik edecek aksesuarlar. Her Bizon ürünü bir hikâye taşır — sizin hikâyeniz.
+      </p>
+    </div>
+  </section>
+
+  <Atelier />
+  <StitchDemo />
+
+  <section class="care wrap" id="bakim" aria-labelledby="care-title">
+    <div class="care-head">
+      <p class="label">Bakım</p>
+      <h2 id="care-title" class="display d-l" data-reveal="lines">
+        <span class="ln"><span>Az bakım,</span></span>
+        <span class="ln"><span>uzun ömür.</span></span>
+      </h2>
+    </div>
+    <ol class="care-list" role="list">
+      {
+        care.map((c, i) => (
+          <li class="care-item" data-reveal="fade" data-delay={String(i * 0.06)}>
+            <span class="care-no display">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{c.q}</h3>
+            <p>{c.a}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="ab-cta wrap" aria-label="Devam et">
+    <a class="ab-link" href={url('/koleksiyon/')}>
+      <span class="label">Sıradaki</span>
+      <span class="display ab-link-t">Koleksiyon <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="ab-link" href={url('/kisisellestir/')}>
+      <span class="label">ya da</span>
+      <span class="display ab-link-t">Adını bas <span aria-hidden="true">→</span></span>
+    </a>
+  </section>
+</Layout>
+
+<style>
+  .ab-hero {
+    padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
+  }
+  .ab-hero-grid {
+    display: grid;
+    gap: 22px;
+  }
+  .ab-hero h1 {
+    margin-left: -0.04em;
+  }
+  .ab-photo {
+    margin: clamp(40px, 6vw, 80px) var(--gutter) 0;
+    height: min(80svh, 820px);
+    border-radius: 28px;
+    overflow: hidden;
+    background: #000;
+  }
+  .ab-photo-inner {
+    height: 116%;
+    margin-top: -8%;
+  }
+  .ab-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ab-story {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 40px clamp(40px, 6vw, 110px);
+    padding-block: clamp(90px, 12vw, 160px);
+  }
+  .ab-col {
+    display: grid;
+    gap: 22px;
+    align-content: start;
+  }
+  .ab-big {
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.8rem);
+    line-height: 1.15;
+    font-weight: 500;
+    font-stretch: 86%;
+    text-wrap: pretty;
+  }
+  .ab-facts {
+    display: grid;
+    align-content: start;
+  }
+  .ab-facts div {
+    display: grid;
+    grid-template-columns: 7em 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+  }
+  .ab-facts dt {
+    color: var(--thread-light);
+    padding-top: 2px;
+  }
+  .ab-mission {
+    padding-block: clamp(90px, 12vw, 170px);
+    border-radius: 36px 36px 0 0;
+  }
+  .mission-grid {
+    display: grid;
+    gap: 26px;
+  }
+  .mission-sub {
+    max-width: 44ch;
+    color: var(--mute-ink);
+    font-size: 1.15rem;
+  }
+  .ab-mission + :global(.atl) {
+    border-radius: 0;
+    padding-top: 0;
+  }
+  .care {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px clamp(40px, 6vw, 100px);
+    padding-block: clamp(90px, 12vw, 160px);
+    scroll-margin-top: var(--header-h);
+  }
+  .care-head {
+    display: grid;
+    gap: 22px;
+    align-content: start;
+  }
+  .care-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 32px;
+  }
+  .care-item {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    padding: 24px 0 34px;
+    border-top: 2px solid transparent;
+    border-image: repeating-linear-gradient(90deg, var(--thread) 0 7px, transparent 7px 12px) 2;
+  }
+  .care-no {
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--thread);
+  }
+  .care-item h3 {
+    font-weight: 700;
+    font-stretch: 90%;
+    font-size: 1.2rem;
+    line-height: 1.25;
+  }
+  .care-item p {
+    color: var(--mute);
+  }
+  .ab-cta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding-bottom: clamp(90px, 12vw, 160px);
+  }
+  .ab-link {
+    display: grid;
+    gap: 14px;
+    padding: 34px;
+    border-radius: 24px;
+    background: var(--forest);
+    text-decoration: none;
+    transition: background 0.4s;
+  }
+  .ab-link:hover {
+    background: var(--moss);
+  }
+  .ab-link-t {
+    font-size: clamp(2.4rem, 5vw, 5rem);
+    transition: font-stretch 0.7s var(--ease-settle);
+  }
+  .ab-link:hover .ab-link-t {
+    font-stretch: 110%;
+  }
+  @media (max-width: 900px) {
+    .ab-story,
+    .care,
+    .care-list,
+    .ab-cta {
+      grid-template-columns: 1fr;
+    }
+    .ab-photo {
+      height: 56svh;
+      border-radius: 20px;
+    }
+    .ab-mission {
+      border-radius: 24px 24px 0 0;
+    }
+  }
+</style>

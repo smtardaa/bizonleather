@@ -1,0 +1,125 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  updated?: string;
+  toc: { id: string; label: string }[];
+}
+const { eyebrow, title, updated, toc } = Astro.props;
+---
+
+<article class="legal">
+  <header class="legal-hero wrap">
+    <p class="label">{eyebrow}</p>
+    <h1 class="display d-xl" data-reveal="lines"><span class="ln"><span>{title}</span></span></h1>
+    {updated && <p class="mono legal-upd">{updated}</p>}
+  </header>
+  <div class="legal-sheet chalk">
+    <div class="wrap legal-grid">
+      <nav class="legal-toc" aria-label="Bölümler">
+        <ol role="list">
+          {toc.map((t, i) => (
+            <li>
+              <a class="link-u" href={`#${t.id}`}>
+                <span class="mono">{String(i + 1).padStart(2, '0')}</span> {t.label}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <div class="legal-body">
+        <slot />
+      </div>
+    </div>
+  </div>
+</article>
+
+<style is:global>
+  .legal-hero {
+    padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
+    padding-bottom: clamp(40px, 6vw, 80px);
+    display: grid;
+    gap: 20px;
+  }
+  .legal-upd {
+    color: var(--mute);
+  }
+  .legal-sheet {
+    border-radius: 36px 36px 0 0;
+    padding-block: clamp(60px, 8vw, 120px);
+  }
+  .legal-grid {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 40px clamp(40px, 6vw, 110px);
+  }
+  .legal-toc ol {
+    position: sticky;
+    top: calc(var(--header-h) + 30px);
+    display: grid;
+    gap: 12px;
+  }
+  .legal-toc a {
+    text-decoration: none;
+    font-weight: 600;
+    font-stretch: 90%;
+  }
+  .legal-toc .mono {
+    color: var(--thread-ink);
+    margin-right: 6px;
+  }
+  .legal-body {
+    max-width: 70ch;
+  }
+  .legal-body section {
+    padding-bottom: 44px;
+    margin-bottom: 44px;
+    border-bottom: 1px solid var(--line-ink);
+    scroll-margin-top: calc(var(--header-h) + 20px);
+  }
+  .legal-body section:last-child {
+    border-bottom: 0;
+  }
+  .legal-body h2 {
+    font-weight: 800;
+    font-stretch: 75%;
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+    line-height: 1;
+    margin-bottom: 18px;
+  }
+  .legal-body p,
+  .legal-body li {
+    color: #26302a;
+  }
+  .legal-body p + p,
+  .legal-body p + ul,
+  .legal-body ul + p {
+    margin-top: 14px;
+  }
+  .legal-body ul {
+    padding-left: 1.1em;
+    display: grid;
+    gap: 8px;
+  }
+  .legal-body li::marker {
+    color: var(--thread-ink);
+  }
+  .legal-body strong {
+    font-weight: 700;
+  }
+  .legal-body a {
+    color: var(--thread-ink);
+  }
+  @media (max-width: 900px) {
+    .legal-grid {
+      grid-template-columns: 1fr;
+    }
+    .legal-toc ol {
+      position: static;
+    }
+    .legal-sheet {
+      border-radius: 24px 24px 0 0;
+    }
+  }
+</style>

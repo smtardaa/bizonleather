@@ -1,0 +1,90 @@
+---
+import { url } from '../lib/url';
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import archivoLatinExt from '@fontsource-variable/archivo/files/archivo-latin-ext-wdth-normal.woff2?url';
+import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CartDrawer from '../components/CartDrawer.astro';
+import Curtain from '../components/Curtain.astro';
+import { SITE } from '../data/site';
+import { img } from '../data/products';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  page?: string;
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+}
+const { title, description = SITE.description, image = 'atolye', page = 'page', jsonLd, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} — Bizon Leather` : 'Bizon Leather — Eskişehir’de el yapımı hakiki deri';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const og = await getImage({ src: img(image), width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const ogUrl = new URL(og.src, Astro.site).href;
+
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Bizon Leather',
+  url: SITE.url,
+  email: SITE.email,
+  sameAs: [SITE.instagramUrl],
+  address: { '@type': 'PostalAddress', addressLocality: 'Eskişehir', addressCountry: 'TR' },
+};
+---
+
+<!doctype html>
+<html lang="tr" data-page={page}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#060807" />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={archivoLatinExt} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:site_name" content="Bizon Leather" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd ?? org)} />
+
+    <script is:inline>
+      // JS çalışıyorsa giriş animasyonları için içerik gizlenir; bir şey ters giderse 2.5 sn sonra görünür kalır.
+      document.documentElement.classList.add('js');
+      window.__bizonFallback = setTimeout(function () {
+        document.documentElement.classList.remove('js');
+      }, 2500);
+    </script>
+    <ClientRouter fallback="swap" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">İçeriğe geç</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <CartDrawer />
+    <Curtain />
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>

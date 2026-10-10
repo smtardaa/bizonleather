@@ -1,0 +1,435 @@
+---
+import { url } from '../lib/url';
+import Bison from './Bison.astro';
+import { NAV, SITE } from '../data/site';
+const primary = NAV.slice(0, 4);
+---
+
+<header class="site-header" data-header transition:persist="site-header">
+  <div class="hdr wrap">
+    <a href={url('/')} class="brand" aria-label="Bizon Leather — Ana sayfa">
+      <Bison class="brand-mark" />
+      <span class="brand-word" aria-hidden="true" lang="en">
+        <span class="brand-bizon">Bizon</span>
+        <span class="brand-leather">Leather</span>
+      </span>
+    </a>
+
+    <nav class="hdr-nav" aria-label="Ana menü">
+      <ul role="list">
+        {
+          primary.map((n) => (
+            <li>
+              <a href={url(n.href)} data-nav-link>
+                {n.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="hdr-actions">
+      <button class="hdr-btn cart-btn" type="button" data-cart-open aria-haspopup="dialog">
+        <span>Sepet</span>
+        <span class="cart-count" data-cart-count aria-label="Sepetteki ürün sayısı">0</span>
+      </button>
+      <button class="hdr-btn menu-btn" type="button" data-menu-open aria-haspopup="dialog" aria-controls="menu">
+        <span class="menu-lines" aria-hidden="true"><i></i><i></i></span>
+        <span>Menü</span>
+      </button>
+    </div>
+  </div>
+
+  <dialog class="menu" id="menu" aria-label="Site menüsü" data-menu>
+    <div class="menu-inner wrap">
+      <div class="menu-top">
+        <span class="label">Bizon Leather — Eskişehir</span>
+        <button class="hdr-btn" type="button" data-menu-close>
+          <span>Kapat</span>
+          <span class="x" aria-hidden="true"></span>
+        </button>
+      </div>
+      <nav aria-label="Tüm sayfalar">
+        <ol class="menu-list" role="list">
+          <li class="menu-item">
+            <a href={url('/')} data-nav-link>
+              <span class="mi-no mono">00</span>
+              <span class="mi-label display">Ana Sayfa</span>
+              <span class="mi-note mono">Başlangıç</span>
+            </a>
+          </li>
+          {
+            NAV.map((n, i) => (
+              <li class="menu-item">
+                <a href={url(n.href)} data-nav-link>
+                  <span class="mi-no mono">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="mi-label display">{n.label}</span>
+                  <span class="mi-note mono">{n.note}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <div class="menu-foot">
+        <a class="mono link-u" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        <a class="mono link-u" href={SITE.instagramUrl} target="_blank" rel="noopener">Instagram @{SITE.instagram}</a>
+        <span class="mono">{SITE.hours}</span>
+        <div class="menu-legal mono">
+          <a class="link-u" href={url('/teslimat-ve-iade/')}>Teslimat & İade</a>
+          <a class="link-u" href={url('/gizlilik/')}>Gizlilik</a>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</header>
+
+<style is:global>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    pointer-events: none;
+  }
+  .hdr {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    pointer-events: auto;
+    position: relative;
+  }
+  .hdr::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, rgb(6 8 7 / 0.94), rgb(6 8 7 / 0.7) 55%, rgb(6 8 7 / 0));
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .site-header.is-scrolled .hdr::before {
+    opacity: 1;
+  }
+  .site-header.is-hidden .hdr {
+    transform: translateY(-110%);
+  }
+  .hdr {
+    transition: transform 0.6s var(--ease-cut);
+  }
+
+  /* Açık (tebeşir) bölümlerin üzerindeyken koyu başlık */
+  .site-header.on-light .hdr {
+    color: var(--ink);
+  }
+  .site-header.on-light .hdr::before {
+    background: linear-gradient(to bottom, rgb(232 233 226 / 0.96), rgb(232 233 226 / 0.7) 55%, rgb(232 233 226 / 0));
+  }
+  .site-header.on-light .brand,
+  .site-header.on-light .hdr-nav a {
+    color: var(--ink);
+  }
+  .site-header.on-light .brand-leather {
+    color: var(--mute-ink);
+  }
+  .site-header.on-light .hdr-actions .hdr-btn {
+    background: rgb(6 8 7 / 0.08);
+    color: var(--ink);
+  }
+  .brand,
+  .hdr-nav a,
+  .hdr-btn {
+    transition: color 0.35s, background 0.35s;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--chalk);
+    margin-right: auto;
+  }
+  .brand-mark {
+    width: 34px;
+    height: auto;
+    transition: transform 0.6s var(--ease-settle);
+  }
+  .brand:hover .brand-mark {
+    transform: rotate(-8deg) scale(1.06);
+  }
+  .brand-word {
+    display: grid;
+    line-height: 0.9;
+  }
+  .brand-bizon {
+    font-weight: 800;
+    font-stretch: 125%;
+    text-transform: uppercase;
+    font-size: 1.12rem;
+    letter-spacing: 0.04em;
+  }
+  .brand-leather {
+    font-family: var(--f-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-top: 3px;
+  }
+
+  .hdr-nav ul {
+    display: flex;
+    gap: clamp(18px, 2.2vw, 36px);
+  }
+  .hdr-nav a {
+    position: relative;
+    text-decoration: none;
+    font-weight: 600;
+    font-stretch: 88%;
+    font-size: 0.95rem;
+    padding: 8px 0;
+    color: var(--chalk);
+    transition: font-stretch 0.5s var(--ease-settle);
+  }
+  .hdr-nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    height: 2px;
+    background-image: linear-gradient(90deg, var(--thread) 0 60%, transparent 60%);
+    background-size: 8px 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease-cut);
+  }
+  .hdr-nav a:hover,
+  .hdr-nav a[aria-current='page'] {
+    font-stretch: 112%;
+  }
+  .hdr-nav a:hover::after,
+  .hdr-nav a[aria-current='page']::after {
+    transform: none;
+  }
+
+  .hdr-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .hdr-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 0;
+    background: rgb(232 233 226 / 0.08);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--chalk);
+    font-family: var(--f-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+      background 0.3s,
+      transform 0.25s var(--ease-settle);
+  }
+  .hdr-btn:hover {
+    background: rgb(232 233 226 / 0.16);
+  }
+  .hdr-btn:active {
+    transform: scale(0.96);
+  }
+  .cart-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--thread);
+    color: #fff;
+    font-size: 0.72rem;
+    transition: transform 0.4s var(--ease-settle);
+  }
+  .cart-count.bump {
+    animation: bump 0.6s var(--ease-settle);
+  }
+  @keyframes bump {
+    30% {
+      transform: scale(1.45);
+    }
+  }
+  .menu-lines {
+    display: grid;
+    gap: 5px;
+    width: 18px;
+  }
+  .menu-lines i {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.4s var(--ease-settle);
+  }
+  .menu-lines i:last-child {
+    width: 60%;
+    justify-self: end;
+  }
+  .menu-btn:hover .menu-lines i:last-child {
+    transform: scaleX(1.66);
+    transform-origin: right;
+  }
+
+  /* ---------- Menü ---------- */
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--forest);
+    color: var(--chalk);
+    overflow-y: auto;
+    pointer-events: auto;
+    overscroll-behavior: contain;
+  }
+  .menu::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+  .menu[open] {
+    display: block;
+  }
+  .menu-inner {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 28px;
+  }
+  .menu-top {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .x {
+    position: relative;
+    width: 14px;
+    height: 14px;
+  }
+  .x::before,
+  .x::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    background: currentColor;
+    transform: rotate(45deg);
+  }
+  .x::after {
+    transform: rotate(-45deg);
+  }
+  .menu-list {
+    margin: auto 0;
+    padding: 4vh 0;
+  }
+  .menu-item a {
+    display: grid;
+    grid-template-columns: 3.2em 1fr auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 0.5vh 0;
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .mi-no {
+    color: var(--thread-light);
+  }
+  .mi-label {
+    font-size: clamp(2.6rem, 8.2vh, 6.4rem);
+    line-height: 1;
+    padding: 0.06em 0 0.02em;
+    transition:
+      font-stretch 0.7s var(--ease-settle),
+      color 0.3s;
+  }
+  .mi-note {
+    color: var(--mute);
+    text-align: right;
+    transition: color 0.3s;
+  }
+  .menu-item a:hover .mi-label,
+  .menu-item a:focus-visible .mi-label {
+    font-stretch: 125%;
+  }
+  .menu-item a[aria-current='page'] .mi-label {
+    color: var(--thread-light);
+  }
+  .menu-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    padding-top: 20px;
+    color: var(--mute);
+  }
+  .menu-foot a {
+    color: var(--chalk);
+  }
+  .menu-legal {
+    display: flex;
+    gap: 20px;
+    margin-left: auto;
+  }
+
+  @media (max-width: 1023px) {
+    .hdr-nav {
+      display: none;
+    }
+  }
+  @media (max-width: 640px) {
+    :root {
+      --header-h: 64px;
+    }
+    .brand-mark {
+      width: 28px;
+    }
+    .brand-bizon {
+      font-size: 0.98rem;
+    }
+    .hdr-btn {
+      padding: 0 13px;
+      height: 40px;
+    }
+    .menu-btn > span:last-child,
+    .cart-btn > span:first-child {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .menu-item a {
+      grid-template-columns: 2.2em 1fr;
+    }
+    .mi-note {
+      display: none;
+    }
+    .menu-legal {
+      margin-left: 0;
+    }
+  }
+</style>

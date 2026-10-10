@@ -1,0 +1,15 @@
+---
+// Bizon Leather'ın çizgisel bizon başı logosu (mevcut site görselinden vektörleştirildi).
+import svg from '../assets/bison.svg?raw';
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: cls = '', title } = Astro.props;
+const html = svg.replace(
+  '<svg ',
+  `<svg class="bison ${cls}" ${title ? `role="img" aria-label="${title}"` : 'aria-hidden="true" focusable="false"'} `,
+);
+---
+
+<Fragment set:html={html} />

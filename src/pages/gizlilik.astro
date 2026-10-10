@@ -1,0 +1,69 @@
+---
+import { url } from '../lib/url';
+import Layout from '../layouts/Layout.astro';
+import LegalDoc from '../components/LegalDoc.astro';
+const toc = [
+  { id: 'veriler', label: 'Topladığımız veriler' },
+  { id: 'kullanim', label: 'Verileri nasıl kullanıyoruz' },
+  { id: 'cerezler', label: 'Çerezler' },
+  { id: 'paylasim', label: 'Veri paylaşımı' },
+  { id: 'haklar', label: 'Haklarınız' },
+];
+---
+
+<Layout title="Gizlilik Politikası" description="Bizon Leather gizlilik politikası: hangi verileri topladığımız, nasıl kullandığımız ve nasıl koruduğumuz." page="legal">
+  <LegalDoc eyebrow="KVKK · Gizlilik" title="Gizlilik" updated="Son güncelleme: Eylül 2026" toc={toc}>
+    <p>
+      bizon.leather olarak kişisel verilerinizin gizliliğine ve güvenliğine büyük önem veriyoruz. Bu sayfa, hangi verileri topladığımızı, nasıl
+      kullandığımızı ve nasıl koruduğumuzu açıklar.
+    </p>
+    <br />
+    <section id="veriler">
+      <h2>Topladığımız veriler</h2>
+      <ul>
+        <li><strong>Sipariş bilgileri:</strong> Ad, soyad, e-posta, telefon, teslimat adresi</li>
+        <li><strong>Ödeme bilgileri:</strong> Kart bilgileri güvenli ödeme altyapısı üzerinden işlenir; tarafımızca depolanmaz.</li>
+        <li><strong>Teknik veriler:</strong> IP adresi, tarayıcı türü, ziyaret edilen sayfalar (analitik amaçlı)</li>
+        <li><strong>Hesap bilgileri:</strong> Kayıtlı üyeler için e-posta ve şifre (şifreniz şifreli olarak saklanır)</li>
+      </ul>
+    </section>
+    <section id="kullanim">
+      <h2>Verileri nasıl kullanıyoruz</h2>
+      <ul>
+        <li>Siparişlerinizi işlemek ve teslim etmek</li>
+        <li>Müşteri hizmetleri sağlamak</li>
+        <li>İzniniz dahilinde pazarlama iletişimleri göndermek</li>
+        <li>Web sitemizi geliştirmek ve kullanıcı deneyimini iyileştirmek</li>
+        <li>Yasal yükümlülüklerimizi yerine getirmek</li>
+      </ul>
+    </section>
+    <section id="cerezler">
+      <h2>Çerezler</h2>
+      <p>
+        Web sitemiz, deneyiminizi kişiselleştirmek ve analitik amaçlarla çerezler kullanmaktadır. Tarayıcı ayarlarınızdan çerezleri devre dışı
+        bırakabilirsiniz; ancak bu durumda bazı özellikler çalışmayabilir.
+      </p>
+      <p>
+        Bu sitedeki sepet, yalnızca tarayıcınızın yerel depolamasında (localStorage) tutulur; ödeme adımına geçene kadar hiçbir sunucuya
+        gönderilmez.
+      </p>
+    </section>
+    <section id="paylasim">
+      <h2>Veri paylaşımı</h2>
+      <p>
+        Kişisel verileriniz üçüncü taraflarla; yasal zorunluluk, kargo ve ödeme hizmeti sağlayan iş ortaklarımız dışında paylaşılmaz veya
+        satılmaz.
+      </p>
+    </section>
+    <section id="haklar">
+      <h2>Haklarınız</h2>
+      <ul>
+        <li>Kişisel verilerinize erişim talep etme</li>
+        <li>Verilerinizin düzeltilmesini veya silinmesini isteme</li>
+        <li>Pazarlama iletişimlerinden abonelikten çıkma</li>
+        <li>KVKK kapsamında veri işlemeye itiraz etme</li>
+      </ul>
+      <p>Gizlilik politikamızla ilgili sorularınız için <a href={url('/iletisim/')}>İletişim</a> sayfasını kullanabilirsiniz.</p>
+    </section>
+  </LegalDoc>
+</Layout>

@@ -1,0 +1,43 @@
+---
+import { url } from '../lib/url';
+import Layout from '../layouts/Layout.astro';
+import Bison from '../components/Bison.astro';
+---
+
+<Layout title="Sayfa bulunamadı" page="404" noindex>
+  <section class="nf wrap">
+    <Bison class="nf-mark" />
+    <p class="label">404</p>
+    <h1 class="display d-xxl" data-reveal="lines">
+      <span class="ln"><span>İz yok.</span></span>
+    </h1>
+    <p class="nf-text">Aradığınız sayfa taşınmış ya da hiç dikilmemiş olabilir.</p>
+    <div class="nf-cta">
+      <a class="btn" href={url('/')}>Ana sayfa <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn--ghost" href={url('/koleksiyon/')}>Koleksiyon</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nf {
+    min-height: 90svh;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 22px;
+    padding-top: var(--header-h);
+  }
+  :global(.nf-mark) {
+    width: 80px;
+    color: var(--thread);
+  }
+  .nf-text {
+    color: var(--mute);
+  }
+  .nf-cta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+</style>

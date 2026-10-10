@@ -1,0 +1,442 @@
+---
+import { url } from '../../lib/url';
+import { Image } from 'astro:assets';
+import { products, img, tl, productUrl } from '../../data/products';
+
+const pick = (slug: string, image: string) => {
+  const p = products.find((x) => x.slug === slug)!;
+  return { p, image };
+};
+const slides = [
+  pick('veyra', 'veyra-6'),
+  pick('daren', 'daren-0'),
+  pick('atlas', 'atlas-0'),
+  pick('journals', 'journals-0'),
+  pick('matara', 'matara-3'),
+];
+---
+
+<section class="hero" data-hero aria-labelledby="hero-title">
+  <div class="hero-grid wrap">
+    <div class="hero-copy">
+      <p class="label hero-eyebrow" data-hero-fade>
+        <span class="dot" aria-hidden="true"></span> Eskişehir atölyesi · El yapımı · %100 hakiki sığır derisi
+      </p>
+      <h1 id="hero-title" class="display hero-title" data-hero-title>
+        <span class="ln"><span>Zamanla</span></span>
+        <span class="ln"><span>güzelleşen</span></span>
+        <span class="ln"><span>deri<b class="hero-dot">.</b></span></span>
+      </h1>
+      <p class="lead hero-lead" data-hero-fade>
+        Cüzdan, ajanda kılıfı, matara ve hediye setleri. Eskişehir'deki atölyemizde elde kesilir, elde dikilir.
+      </p>
+      <div class="hero-cta" data-hero-fade>
+        <a class="btn" href={url('/koleksiyon/')}>Koleksiyonu keşfet <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost" href="#adini-bas">Adını deriye bas</a>
+      </div>
+    </div>
+
+    <div class="hero-stage" data-stage>
+      <div class="stage-frame" data-stage-frame>
+        <div class="stage-tilt" data-stage-tilt>
+          {
+            slides.map(({ p, image }, i) => (
+              <a
+                class:list={['stage-slide', { 'is-active': i === 0 }]}
+                href={productUrl(p)}
+                data-slide={i}
+                aria-hidden={i !== 0 ? 'true' : undefined}
+                tabindex={i !== 0 ? -1 : undefined}
+              >
+                <Image
+                  src={img(image)}
+                  alt={`${p.name} — ${p.kind.toLowerCase()}`}
+                  widths={[480, 720, 1024]}
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={i === 0 ? 'high' : 'auto'}
+                />
+              </a>
+            ))
+          }
+          <span class="stage-sheen" aria-hidden="true" data-stage-sheen></span>
+          <span class="stage-blade" aria-hidden="true" data-stage-blade></span>
+        </div>
+        <svg class="stage-stitch" aria-hidden="true">
+          <defs>
+            <mask id="stage-stitch-mask" maskUnits="userSpaceOnUse">
+              <rect class="stitch-draw" x="12" y="12" width="0" height="0" rx="10" pathLength="1"></rect>
+            </mask>
+          </defs>
+          <rect class="stitch-dash" x="12" y="12" width="0" height="0" rx="10" mask="url(#stage-stitch-mask)"></rect>
+        </svg>
+      </div>
+
+      <div class="stage-meta">
+        <div class="stage-caption" aria-live="polite" data-stage-caption>
+          {
+            slides.map(({ p }, i) => (
+              <p class:list={['cap', { 'is-active': i === 0 }]} data-cap={i} hidden={i !== 0}>
+                <span class="cap-name">{p.name}</span>
+                <span class="cap-kind mono">{p.kind}</span>
+                <span class="price">
+                  <s>{tl(p.compareAt)}</s>
+                  {tl(p.price)}
+                </span>
+              </p>
+            ))
+          }
+        </div>
+        <div class="stage-index" role="group" aria-label="Öne çıkan ürünler">
+          {
+            slides.map(({ p }, i) => (
+              <button type="button" class="si" data-go={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+                <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+                <span class="sr-only">{p.name}</span>
+                <i class="si-bar" aria-hidden="true">
+                  <i />
+                </i>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-foot wrap" data-hero-fade>
+    <span class="mono">Açılışa özel tüm ürünlerde %10 indirim</span>
+    <span class="scroll-cue mono" aria-hidden="true"><i></i> Kaydır</span>
+  </div>
+</section>
+
+<style is:global>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + clamp(12px, 3vh, 40px));
+    display: flex;
+    flex-direction: column;
+    overflow: clip;
+  }
+  .hero::before {
+    /* Atölye ışığı: sahnenin arkasından gelen soğuk yeşil bir parıltı */
+    content: '';
+    position: absolute;
+    inset: -20% -10% auto 30%;
+    height: 120%;
+    background: radial-gradient(closest-side, rgb(26 58 44 / 0.55), transparent 75%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: relative;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(24px, 4vw, 72px);
+    align-items: center;
+  }
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: clamp(18px, 3vh, 32px);
+    align-content: center;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--thread);
+    box-shadow: 0 0 0 4px rgb(59 92 255 / 0.18);
+  }
+  .hero-title {
+    font-size: min(9.4vw, 17vh);
+    line-height: 0.93;
+    margin-left: -0.04em;
+  }
+  .hero-title .ln:nth-child(2) {
+    padding-left: 0.5em;
+  }
+  .hero-dot {
+    color: var(--thread);
+    font-weight: inherit;
+  }
+  .hero-lead {
+    max-width: 34ch;
+  }
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Sahne */
+  .hero-stage {
+    position: relative;
+    display: grid;
+    gap: 16px;
+    align-self: center;
+  }
+  .stage-frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    max-height: calc(100svh - var(--header-h) - 150px);
+    width: 100%;
+    margin-left: auto;
+    perspective: 1200px;
+  }
+  .stage-tilt {
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #000;
+    transform-style: preserve-3d;
+    box-shadow:
+      0 40px 80px -30px rgb(0 0 0 / 0.9),
+      0 0 0 1px rgb(255 255 255 / 0.06);
+  }
+  .stage-slide {
+    position: absolute;
+    inset: 0;
+    display: block;
+    visibility: hidden;
+  }
+  .stage-slide.is-active {
+    visibility: visible;
+  }
+  .stage-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 55%;
+  }
+  .stage-sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      40% 35% at var(--sx, 70%) var(--sy, 20%),
+      rgb(255 255 255 / 0.16),
+      transparent 70%
+    );
+    mix-blend-mode: soft-light;
+    z-index: 3;
+  }
+  .stage-blade {
+    position: absolute;
+    top: -20%;
+    bottom: -20%;
+    left: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--chalk) 30%, var(--chalk) 70%, transparent);
+    box-shadow: 0 0 18px 2px rgb(232 233 226 / 0.6);
+    transform: rotate(12deg);
+    opacity: 0;
+    z-index: 4;
+    pointer-events: none;
+  }
+  .stage-stitch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 5;
+  }
+  .stage-stitch rect {
+    fill: none;
+  }
+  .stitch-dash {
+    stroke: var(--thread);
+    stroke-width: 2.2;
+    stroke-dasharray: 9 6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.6));
+  }
+  .stitch-draw {
+    stroke: #fff;
+    stroke-width: 8;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 0;
+  }
+
+  .stage-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .stage-caption {
+    position: relative;
+    min-height: 3.6em;
+  }
+  .cap {
+    display: grid;
+    gap: 2px;
+  }
+  .cap[hidden] {
+    display: none;
+  }
+  .cap-name {
+    font-weight: 800;
+    font-stretch: 125%;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  .cap-kind {
+    color: var(--mute);
+  }
+  .cap .price {
+    font-size: 0.85rem;
+  }
+  .stage-index {
+    display: flex;
+    gap: 4px;
+  }
+  .si {
+    display: grid;
+    gap: 6px;
+    justify-items: start;
+    width: 44px;
+    padding: 8px 2px;
+    background: none;
+    border: 0;
+    color: var(--mute);
+    transition: color 0.3s;
+  }
+  .si:hover,
+  .si[aria-pressed='true'] {
+    color: var(--chalk);
+  }
+  .si-bar {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-image: linear-gradient(90deg, rgb(232 233 226 / 0.25) 0 60%, transparent 60%);
+    background-size: 7px 2px;
+  }
+  .si-bar i {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(90deg, var(--thread-light) 0 60%, transparent 60%);
+    background-size: 7px 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .si[aria-pressed='true'] .si-bar i {
+    transform: scaleX(var(--p, 1));
+  }
+
+  .hero-foot {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: clamp(16px, 3vh, 28px);
+    color: var(--mute);
+  }
+  .scroll-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+  .scroll-cue i {
+    position: relative;
+    width: 2px;
+    height: 34px;
+    overflow: hidden;
+    background-image: linear-gradient(180deg, rgb(232 233 226 / 0.3) 0 60%, transparent 60%);
+    background-size: 2px 7px;
+  }
+  .scroll-cue i::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 2px;
+    height: 12px;
+    background: var(--thread-light);
+    animation: needle 1.8s var(--ease-cut) infinite;
+  }
+  @keyframes needle {
+    0% {
+      transform: translateY(-14px);
+    }
+    100% {
+      transform: translateY(36px);
+    }
+  }
+
+  .js .hero [data-hero-fade],
+  .js .hero-title {
+    opacity: 0;
+  }
+  .js .stage-frame {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  @media (max-width: 1023px) {
+    .hero {
+      min-height: auto;
+    }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+    .hero-copy {
+      display: contents;
+    }
+    .hero-eyebrow {
+      order: 1;
+    }
+    .hero-title {
+      order: 2;
+      font-size: min(16.8vw, 9.5rem);
+    }
+    .hero-stage {
+      order: 3;
+    }
+    .hero-lead {
+      order: 4;
+    }
+    .hero-cta {
+      order: 5;
+    }
+    .stage-frame {
+      aspect-ratio: 5 / 5;
+      max-height: 64svh;
+    }
+    .hero-foot {
+      padding-top: 40px;
+    }
+  }
+  @media (max-width: 520px) {
+    .hero-eyebrow {
+      font-size: 0.68rem;
+    }
+    .hero-title .ln:nth-child(2) {
+      padding-left: 0.25em;
+    }
+    .stage-frame {
+      margin-inline: calc(var(--gutter) * -1 + 6px);
+      width: auto;
+    }
+    .hero-cta .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .scroll-cue {
+      display: none;
+    }
+  }
+</style>

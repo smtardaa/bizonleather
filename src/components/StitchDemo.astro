@@ -1,0 +1,118 @@
+---
+// Saraç dikişi ile makine dikişinin farkı: bir ilmeği kes, ne olduğunu gör.
+---
+
+<section class="sd" data-stitch-demo aria-labelledby="sd-title">
+  <div class="wrap sd-grid">
+    <div class="sd-copy">
+      <p class="label">Saraç dikişi</p>
+      <h2 id="sd-title" class="display d-l" data-reveal="lines">
+        <span class="ln"><span>Bir ilmeği</span></span>
+        <span class="ln"><span class="thread-text">kesin.</span></span>
+      </h2>
+      <p class="sd-text" data-reveal="fade">
+        Her dikiş elde, iki iğneyle kilitlenir. Bu yüzden ip bir yerden kopsa bile dikiş sökülmez. Farkı kendiniz deneyin.
+      </p>
+      <fieldset class="sd-mode">
+        <legend class="label">Dikiş türü</legend>
+        <label class="chip"><input type="radio" name="sd-mode" value="saddle" checked /><span>Saraç dikişi (el)</span></label>
+        <label class="chip"><input type="radio" name="sd-mode" value="machine" /><span>Zincir/makine dikişi</span></label>
+      </fieldset>
+      <div class="sd-actions">
+        <button type="button" class="btn btn--thread" data-sd-cut>İpliği kes ✂</button>
+        <button type="button" class="btn btn--ghost" data-sd-reset>Yeniden dik</button>
+      </div>
+      <p class="mono sd-status" role="status" aria-live="polite" data-sd-status></p>
+    </div>
+
+    <div class="sd-stage">
+      <svg viewBox="0 0 1000 340" class="sd-svg" role="img" aria-label="Deri kenarında dikiş canlandırması" data-sd-svg>
+        <defs>
+          <linearGradient id="sd-leather" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#24543d"></stop>
+            <stop offset="1" stop-color="#143224"></stop>
+          </linearGradient>
+          <linearGradient id="sd-leather-b" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a3d2c"></stop>
+            <stop offset="1" stop-color="#0d2018"></stop>
+          </linearGradient>
+          <filter id="sd-shadow" x="-10%" y="-10%" width="120%" height="140%">
+            <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.6"></feDropShadow>
+          </filter>
+        </defs>
+        <rect x="30" y="96" width="940" height="190" rx="22" fill="url(#sd-leather-b)"></rect>
+        <rect x="30" y="56" width="940" height="200" rx="22" fill="url(#sd-leather)" filter="url(#sd-shadow)"></rect>
+        <rect x="46" y="72" width="908" height="168" rx="14" fill="none" stroke="rgb(255 255 255 / .05)" stroke-width="2"></rect>
+        <g data-sd-holes></g>
+        <path data-sd-loose fill="none" stroke="#3b5cff" stroke-width="5" stroke-linecap="round" d=""></path>
+        <g data-sd-stitches></g>
+        <g data-sd-scissors opacity="0">
+          <text x="0" y="0" font-size="46" text-anchor="middle" fill="#e8e9e2">✂</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .sd {
+    padding-block: clamp(90px, 12vw, 160px);
+  }
+  .sd-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+  }
+  .sd-copy {
+    display: grid;
+    gap: 22px;
+    justify-items: start;
+  }
+  .sd-text {
+    color: var(--mute);
+    max-width: 40ch;
+  }
+  .sd-mode {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .sd-mode legend {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0;
+  }
+  .sd-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sd-status {
+    min-height: 3em;
+    color: var(--thread-light);
+    max-width: 44ch;
+  }
+  .sd-stage {
+    border-radius: 24px;
+    background: radial-gradient(80% 80% at 50% 40%, rgb(255 255 255 / 0.04), transparent 70%), var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+    padding: clamp(10px, 2vw, 30px);
+  }
+  .sd-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  @media (max-width: 1023px) {
+    .sd-grid {
+      grid-template-columns: 1fr;
+    }
+    .sd-stage {
+      order: -1;
+    }
+  }
+</style>

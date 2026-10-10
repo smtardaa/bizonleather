@@ -1,0 +1,164 @@
+---
+import { url } from '../lib/url';
+import Layout from '../layouts/Layout.astro';
+import EmbossStudio from '../components/EmbossStudio.astro';
+import { FAQ, SITE } from '../data/site';
+const perso = FAQ.find((f) => f.group === 'Kişiselleştirme')!.items;
+---
+
+<Layout
+  title="Adını Bas — Kişiselleştirme"
+  description="Bizon Leather sıcak gömme baskı: isim, baş harf veya tarih pirinç harflerle deriye işlenir. Önizlemeyi dene, talebini gönder."
+  image="veyra-6"
+  page="perso"
+>
+  <EmbossStudio full />
+
+  <section class="vs wrap" aria-labelledby="vs-title">
+    <p class="label">Teknik</p>
+    <h2 id="vs-title" class="display d-l" data-reveal="lines">
+      <span class="ln"><span>Neden gömme,</span></span>
+      <span class="ln"><span>neden lazer değil?</span></span>
+    </h2>
+    <div class="vs-grid">
+      <div class="vs-col vs-col--us" data-reveal="fade">
+        <p class="mono vs-tag">Sıcak gömme baskı</p>
+        <ul role="list">
+          <li>Özel pirinç harfler ısıtılıp deriye bastırılır.</li>
+          <li>Deriyi yakmaz; dokusunu çökertir.</li>
+          <li>Boya ya da yüzeysel kaplama yok: silinmez, akmaz, soyulmaz.</li>
+        </ul>
+      </div>
+      <div class="vs-col" data-reveal="fade" data-delay="0.1">
+        <p class="mono vs-tag">Lazer baskı</p>
+        <ul role="list">
+          <li>Deriyi yakarak siyah bir iz bırakır.</li>
+          <li>Zamanla yüzeysel kalabilir.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="corp chalk" aria-labelledby="corp-title">
+    <div class="wrap corp-grid">
+      <div>
+        <p class="label">Kurumsal</p>
+        <h2 id="corp-title" class="display d-l" data-reveal="lines">
+          <span class="ln"><span>Logonuz,</span></span>
+          <span class="ln"><span class="thread-text">derinin içinde.</span></span>
+        </h2>
+      </div>
+      <div class="corp-body" data-reveal="fade">
+        <p>
+          Şirket logonuzu cüzdan, kartlık veya anahtarlık gibi ürünlere sıcak gömme baskıyla uygulayabiliyoruz. Bayram, yılbaşı, bayi
+          toplantıları ve kurumsal hediyeler için toptan satış ve özel üretim imkânımız var.
+        </p>
+        <p class="mono">Adet ve teslimat süresi için bize yazın.</p>
+        <div class="corp-cta">
+          <a class="btn btn--ink" href={url('/iletisim/?konu=kurumsal')}>Kurumsal talep oluştur <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="mono link-u" href={`mailto:${SITE.email}?subject=${encodeURIComponent('Kurumsal sipariş')}`}>{SITE.email}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="perso-faq wrap" aria-labelledby="pf-title">
+    <h2 id="pf-title" class="label">Kişiselleştirme hakkında</h2>
+    <div class="pf-list">
+      {
+        perso.map((f) => (
+          <details class="qa">
+            <summary>
+              <span>{f.q}</span>
+              <i aria-hidden="true" />
+            </summary>
+            <p>{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .vs {
+    padding-block: clamp(90px, 12vw, 160px);
+    display: grid;
+    gap: 24px;
+  }
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 20px;
+    margin-top: 30px;
+  }
+  .vs-col {
+    padding: 30px;
+    border-radius: 22px;
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .vs-col--us {
+    background:
+      radial-gradient(90% 120% at 0% 0%, rgb(201 163 90 / 0.2), transparent 60%),
+      var(--ink-2);
+    box-shadow: inset 0 0 0 1px rgb(201 163 90 / 0.35);
+  }
+  .vs-tag {
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 18px;
+  }
+  .vs-col:not(.vs-col--us) .vs-tag {
+    color: var(--mute);
+  }
+  .vs-col ul {
+    display: grid;
+    gap: 14px;
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    line-height: 1.3;
+    font-stretch: 90%;
+  }
+  .vs-col:not(.vs-col--us) ul {
+    color: var(--mute);
+  }
+  .corp {
+    padding-block: clamp(90px, 12vw, 160px);
+    border-radius: 36px;
+  }
+  .corp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px clamp(40px, 6vw, 100px);
+    align-items: end;
+  }
+  .corp-body {
+    display: grid;
+    gap: 18px;
+    font-size: 1.1rem;
+  }
+  .corp-body .mono {
+    color: var(--mute-ink);
+  }
+  .corp-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+  }
+  .perso-faq {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    padding-block: clamp(90px, 12vw, 160px);
+  }
+  @media (max-width: 900px) {
+    .vs-grid,
+    .corp-grid,
+    .perso-faq {
+      grid-template-columns: 1fr;
+    }
+    .corp {
+      border-radius: 24px;
+    }
+  }
+</style>

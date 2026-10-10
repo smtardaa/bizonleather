@@ -1,0 +1,779 @@
+---
+import { url } from '../../lib/url';
+import { Image, getImage } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import { products, img, tl, COLORS, STORE, storeUrl, productUrl, coverImage, type Product } from '../../data/products';
+
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+interface Props {
+  p: Product;
+}
+const { p } = Astro.props;
+const others = products.filter((x) => x.slug !== p.slug);
+const first = p.variants.find((v) => v.available) ?? p.variants[0];
+const thumbs = Object.fromEntries(
+  await Promise.all(
+    p.variants.map(async (v) => [v.id, (await getImage({ src: img(v.images[0]), width: 160, height: 160, fit: 'cover', format: 'webp' })).src]),
+  ),
+);
+const variantsJson = p.variants.map((v) => ({
+  id: v.id,
+  color: v.color,
+  label: v.color ? COLORS[v.color].label : '',
+  available: v.available,
+  thumb: thumbs[v.id],
+}));
+const catLabel = { cuzdan: 'Cüzdan', ajanda: 'Ajanda kılıfı', matara: 'Matara' }[p.category];
+
+const og = await getImage({ src: img(coverImage(p)), width: 1200, height: 1200, format: 'jpg' });
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: `${p.name} — ${p.kind}`,
+  description: p.lead,
+  brand: { '@type': 'Brand', name: 'Bizon Leather' },
+  material: 'Hakiki deri',
+  image: [new URL(og.src, Astro.site).href],
+  offers: p.variants.map((v) => ({
+    '@type': 'Offer',
+    priceCurrency: 'TRY',
+    price: p.price,
+    availability: v.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    url: new URL(productUrl(p), Astro.site).href + (v.color ? `?renk=${v.color}` : ''),
+    ...(v.color ? { color: COLORS[v.color].label } : {}),
+  })),
+};
+---
+
+<Layout title={`${p.name} — ${p.kind}`} description={p.lead.slice(0, 155)} image={coverImage(p)} page="product" jsonLd={jsonLd}>
+  <article class="pdp" data-product data-store={STORE} data-name={p.name} data-kind={p.kind} data-price={p.price} data-url={productUrl(p)}>
+    <script type="application/json" data-variants set:html={JSON.stringify(variantsJson)} />
+    <div class="wrap pdp-grid">
+      <nav class="crumbs mono" aria-label="Sayfa yolu">
+        <a class="link-u" href={url('/koleksiyon/')}>Koleksiyon</a>
+        <span aria-hidden="true">/</span>
+        <a class="link-u" href={url(`/koleksiyon/?kategori=${p.category}`)}>{catLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{p.name}</span>
+      </nav>
+
+      <div class="pdp-gallery" data-gallery>
+        <div class="pg-stage" data-pg-stage>
+          {
+            p.variants.map((v) =>
+              v.images.map((im, k) => (
+                <figure
+                  class:list={['pg-slide', { 'is-on': v.id === first.id && k === 0 }]}
+                  data-pg-slide
+                  data-variant={v.id}
+                  data-index={k}
+                  hidden={!(v.id === first.id && k === 0)}
+                >
+                  <Image
+                    src={img(im)}
+                    alt={`${p.name}${v.color ? ` (${COLORS[v.color].label})` : ''} — görsel ${k + 1}`}
+                    widths={[560, 860, 1200]}
+                    sizes="(min-width: 1024px) 55vw, 100vw"
+                    loading={v.id === first.id && k === 0 ? 'eager' : 'lazy'}
+                    fetchpriority={v.id === first.id && k === 0 ? 'high' : 'auto'}
+                  />
+                </figure>
+              )),
+            )
+          }
+          <svg class="pg-stitch" aria-hidden="true"><rect x="0" y="0" width="0" height="0"></rect></svg>
+          <div class="pg-nav">
+            <button type="button" class="pg-arrow" data-pg-prev aria-label="Önceki görsel">←</button>
+            <span class="mono pg-count" data-pg-count aria-live="polite">1 / {first.images.length}</span>
+            <button type="button" class="pg-arrow" data-pg-next aria-label="Sonraki görsel">→</button>
+          </div>
+        </div>
+        <div class="pg-thumbs" role="group" aria-label="Görseller">
+          {
+            p.variants.map((v) =>
+              v.images.map((im, k) => (
+                <button
+                  type="button"
+                  class="pg-thumb"
+                  data-pg-thumb
+                  data-variant={v.id}
+                  data-index={k}
+                  hidden={v.id !== first.id}
+                  aria-pressed={v.id === first.id && k === 0 ? 'true' : 'false'}
+                  aria-label={`Görsel ${k + 1}`}
+                >
+                  <Image src={img(im)} alt="" widths={[160]} sizes="80px" loading="lazy" />
+                </button>
+              )),
+            )
+          }
+        </div>
+      </div>
+
+      <div class="pdp-buy">
+        <div class="pdp-buy-inner">
+          <p class="label">{p.kind}</p>
+          <h1 class="display pdp-name" data-reveal="lines"><span class="ln"><span>{p.name}</span></span></h1>
+          <p class="pdp-price">
+            <span class="price"><s>{tl(p.compareAt)}</s><b>{tl(p.price)}</b></span>
+            <span class="pdp-badge mono">Açılışa özel indirim</span>
+          </p>
+          <p class="pdp-lead">{p.lead}</p>
+
+          {
+            p.variants.length > 1 && (
+              <fieldset class="pdp-colors">
+                <legend class="label">
+                  Renk: <span data-color-label>{first.color ? COLORS[first.color].label : ''}</span>
+                </legend>
+                <div class="pc-row">
+                  {p.variants.map((v) => (
+                    <label class="pc">
+                      <input type="radio" name="variant" value={v.id} checked={v.id === first.id} data-color={v.color} />
+                      <span class="pc-dot" style={`--c:${v.color ? COLORS[v.color].swatch : '#333'}`} />
+                      <span class="pc-name">
+                        {v.color ? COLORS[v.color].label : ''}
+                        {!v.available && <em class="mono"> — tükendi</em>}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )
+          }
+
+          <p class="pdp-stock mono" data-stock>
+            <i aria-hidden="true"></i><span>{first.available ? 'Stokta · 1–3 iş günü içinde kargoda' : 'Bu renk şu an tükendi'}</span>
+          </p>
+
+          <div class="pdp-actions">
+            <button type="button" class="btn btn--thread" data-add disabled={!first.available}>Sepete ekle <span class="arrow" aria-hidden="true">+</span></button>
+            <a class="btn btn--ghost" data-buy href={`${STORE}/cart/${first.id}:1`} aria-disabled={!first.available ? 'true' : undefined}>Hemen satın al</a>
+          </div>
+          <p class="mono pdp-store-note">
+            Hemen satın al, Bizon Leather'ın Shopify mağazasındaki güvenli ödeme sayfasını açar.
+          </p>
+
+          {
+            p.personalizable && (
+              <a class="pdp-perso" href={url('/kisisellestir/')}>
+                <span class="label">Kişiselleştirilebilir</span>
+                <span class="pp-title display">Adını bas →</span>
+                <span class="mono">İsim, tarih veya baş harf; sıcak gömme baskı.</span>
+              </a>
+            )
+          }
+
+          <ul class="pdp-assure mono" role="list">
+            <li>3.000 TL üzeri ücretsiz kargo</li>
+            <li>14 gün iade (kişiselleştirilmemiş ürünler)</li>
+            <li>Kendi kutusunda, hediyeye hazır</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdp-sticky" data-sticky-buy aria-hidden="true">
+      <span class="ps-name display">{p.name}</span>
+      <span class="price">{tl(p.price)}</span>
+      <button type="button" class="btn btn--thread" data-sticky-add tabindex="-1">Sepete ekle</button>
+    </div>
+
+    <section class="pdp-features wrap" aria-labelledby="feat-title">
+      <h2 id="feat-title" class="label">Öne çıkan özellikler</h2>
+      <ol class="feat-list" role="list" style={`--n:${p.features.length}`}>
+        {
+          p.features.map((f, i) => (
+            <li class="feat" data-reveal="fade" data-delay={String(i * 0.05)}>
+              <span class="feat-no mono">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display feat-title">{f.title}</h3>
+              <p>{f.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="pdp-why chalk" aria-labelledby="why-title">
+      <div class="wrap why-grid">
+        <div>
+          <p class="label">Neden {p.name}?</p>
+          <h2 id="why-title" class="sr-only">Neden {p.name}?</h2>
+          <p class="why-text" data-reveal="fade">{p.why}</p>
+        </div>
+        <div class="ticket" data-reveal="fade">
+          <div class="ticket-head">
+            <span class="display">{p.name}</span>
+            <span class="mono">Ürün detayları</span>
+          </div>
+          <dl>
+            {
+              p.details.map(([k, v]) => (
+                <div>
+                  <dt class="mono">{k}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="ticket-note mono">{p.note}</p>
+          <span class="ticket-hole" aria-hidden="true"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="pdp-more wrap" aria-labelledby="more-title">
+      <h2 id="more-title" class="display d-m">Diğer parçalar</h2>
+      <ul class="more-list" role="list">
+        {
+          others.map((o) => (
+            <li>
+              <a class="more-item" href={productUrl(o)}>
+                <span class="more-img">
+                  <Image src={img(coverImage(o))} alt="" widths={[320, 480]} sizes="(min-width: 1024px) 18vw, 45vw" loading="lazy" />
+                </span>
+                <span class="more-name display">{o.name}</span>
+                <span class="mono more-meta">
+                  {o.kind} · {tl(o.price)}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </article>
+</Layout>
+
+<style>
+  .pdp {
+    padding-top: calc(var(--header-h) + 20px);
+  }
+  .pdp-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 24px clamp(32px, 5vw, 90px);
+    align-items: start;
+  }
+  .crumbs {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    color: var(--mute);
+  }
+  .crumbs a {
+    text-decoration: none;
+  }
+  .crumbs [aria-current] {
+    color: var(--chalk);
+  }
+
+  /* Galeri */
+  .pdp-gallery {
+    display: grid;
+    gap: 14px;
+  }
+  .pg-stage {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #000;
+  }
+  .pg-slide {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+  }
+  .pg-slide[hidden] {
+    display: none;
+  }
+  .pg-slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .pg-stitch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .pg-stitch rect {
+    fill: none;
+    stroke: var(--thread);
+    stroke-width: 2.2;
+    stroke-dasharray: 9 6;
+    stroke-linecap: round;
+  }
+  .pg-nav {
+    position: absolute;
+    right: 26px;
+    bottom: 26px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgb(6 8 7 / 0.65);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .pg-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 0;
+    background: none;
+    transition: background 0.3s;
+  }
+  .pg-arrow:hover {
+    background: rgb(232 233 226 / 0.14);
+  }
+  .pg-count {
+    min-width: 4em;
+    text-align: center;
+  }
+  .pg-thumbs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pg-thumb {
+    width: 76px;
+    height: 76px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    opacity: 0.5;
+    outline-offset: 3px;
+    transition:
+      opacity 0.3s,
+      transform 0.4s var(--ease-settle);
+  }
+  .pg-thumb[hidden] {
+    display: none;
+  }
+  .pg-thumb:hover {
+    opacity: 0.85;
+  }
+  .pg-thumb[aria-pressed='true'] {
+    opacity: 1;
+    box-shadow: 0 0 0 2px var(--thread);
+  }
+  .pg-thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Satın alma paneli */
+  .pdp-buy {
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+  }
+  .pdp-buy-inner {
+    display: grid;
+    gap: 20px;
+  }
+  .pdp-name {
+    font-size: clamp(4rem, 9vw, 9.5rem);
+    line-height: 0.92;
+  }
+  .pdp-price {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .pdp-price .price {
+    font-size: 1.35rem;
+  }
+  .pdp-price b {
+    font-weight: 500;
+  }
+  .pdp-badge {
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgb(59 92 255 / 0.16);
+    color: var(--thread-light);
+  }
+  .pdp-lead {
+    color: var(--mute);
+    max-width: 48ch;
+  }
+  .pdp-colors {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .pdp-colors legend {
+    padding: 0;
+    margin-bottom: 12px;
+  }
+  .pdp-colors legend span {
+    color: var(--chalk);
+  }
+  .pc-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pc {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px 6px 6px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px var(--line);
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+  }
+  .pc input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .pc-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.25), transparent 50%), var(--c);
+    box-shadow: inset 0 -3px 6px rgb(0 0 0 / 0.4);
+  }
+  .pc-name {
+    font-weight: 600;
+    font-stretch: 90%;
+  }
+  .pc-name em {
+    font-style: normal;
+    color: var(--mute);
+  }
+  .pc:has(input:checked) {
+    box-shadow: inset 0 0 0 1.5px var(--chalk);
+  }
+  .pc:has(input:focus-visible) {
+    outline: 2px dashed var(--thread-light);
+    outline-offset: 3px;
+  }
+  .pdp-stock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--mute);
+  }
+  .pdp-stock i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 4px rgb(74 222 128 / 0.15);
+  }
+  .pdp-stock.is-out i {
+    background: #f87171;
+    box-shadow: 0 0 0 4px rgb(248 113 113 / 0.15);
+  }
+  .pdp-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pdp-actions .btn {
+    flex: 1;
+    justify-content: center;
+    min-width: 180px;
+  }
+  .pdp-store-note {
+    color: var(--mute);
+    font-size: 0.7rem;
+    margin-top: -8px;
+  }
+  .pdp-perso {
+    display: grid;
+    gap: 6px;
+    padding: 20px 22px;
+    border-radius: 18px;
+    text-decoration: none;
+    background:
+      radial-gradient(80% 120% at 100% 0%, rgb(201 163 90 / 0.22), transparent 60%),
+      var(--ink-2);
+    box-shadow: inset 0 0 0 1px rgb(201 163 90 / 0.3);
+    transition: transform 0.4s var(--ease-settle);
+  }
+  .pdp-perso:hover {
+    transform: translateY(-3px);
+  }
+  .pp-title {
+    font-size: 2rem;
+    color: var(--brass);
+  }
+  .pdp-perso .mono {
+    color: var(--mute);
+  }
+  .pdp-assure {
+    display: grid;
+    gap: 6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--mute);
+  }
+  .pdp-assure li::before {
+    content: '— ';
+    color: var(--thread-light);
+  }
+
+  /* Mobil yapışkan satın alma çubuğu */
+  .pdp-sticky {
+    display: none;
+  }
+  @media (max-width: 1023px) {
+    .pdp-sticky {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 8px 8px 18px;
+      border-radius: 999px;
+      background: rgb(15 37 28 / 0.92);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px -10px rgb(0 0 0 / 0.7), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+      transform: translateY(140%);
+      transition: transform 0.6s var(--ease-cut);
+    }
+    .pdp-sticky.is-on {
+      transform: none;
+    }
+    .ps-name {
+      font-size: 1.4rem;
+      margin-right: auto;
+    }
+    .pdp-sticky .btn {
+      min-height: 46px;
+    }
+  }
+
+  /* Özellikler */
+  .pdp-features {
+    padding-block: clamp(90px, 12vw, 160px);
+  }
+  .feat-list {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 0 32px;
+    margin-top: 28px;
+  }
+  .feat {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding: 26px 0 32px;
+    border-top: 2px solid transparent;
+    border-image: repeating-linear-gradient(90deg, var(--thread) 0 7px, transparent 7px 12px) 2;
+  }
+  .feat-no {
+    color: var(--thread-light);
+  }
+  .feat-title {
+    font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+    line-height: 0.95;
+  }
+  .feat p {
+    color: var(--mute);
+    max-width: 34ch;
+  }
+
+  /* Neden + bilet */
+  .pdp-why {
+    padding-block: clamp(90px, 12vw, 160px);
+    border-radius: 36px;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: clamp(40px, 6vw, 110px);
+    align-items: center;
+  }
+  .why-text {
+    margin-top: 20px;
+    font-size: clamp(1.6rem, 1.1rem + 1.9vw, 3.1rem);
+    line-height: 1.12;
+    font-weight: 500;
+    font-stretch: 86%;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .ticket {
+    position: relative;
+    padding: 30px 28px 26px;
+    border-radius: 20px;
+    background: var(--ink);
+    color: var(--chalk);
+    box-shadow:
+      inset 0 0 0 9px var(--ink),
+      inset 0 0 0 11px rgb(59 92 255 / 0.9);
+    transform: rotate(-1.4deg);
+  }
+  .ticket::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 12px;
+    border: 2px dashed var(--thread);
+    pointer-events: none;
+  }
+  .ticket-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 6px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ticket-head .display {
+    font-size: 2rem;
+  }
+  .ticket-head .mono {
+    color: var(--mute);
+  }
+  .ticket dl {
+    padding: 8px 6px;
+  }
+  .ticket dl div {
+    display: grid;
+    grid-template-columns: 9.5em 1fr;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .ticket dt {
+    color: var(--mute);
+  }
+  .ticket dd {
+    font-size: 0.95rem;
+  }
+  .ticket-note {
+    padding: 14px 6px 4px;
+    color: var(--mute);
+    font-size: 0.7rem;
+  }
+  .ticket-hole {
+    position: absolute;
+    top: 22px;
+    right: 26px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--chalk);
+    box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.5);
+  }
+
+  /* Diğer parçalar */
+  .pdp-more {
+    padding-block: clamp(90px, 12vw, 160px) 40px;
+  }
+  .more-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 36px;
+  }
+  .more-item {
+    display: grid;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .more-img {
+    display: block;
+    aspect-ratio: 4 / 5;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+  }
+  .more-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s var(--ease-settle);
+  }
+  .more-item:hover .more-img :global(img) {
+    transform: scale(1.06);
+  }
+  .more-name {
+    font-size: 1.9rem;
+    line-height: 1;
+    transition: font-stretch 0.6s var(--ease-settle);
+  }
+  .more-item:hover .more-name {
+    font-stretch: 115%;
+  }
+  .more-meta {
+    color: var(--mute);
+  }
+
+  @media (max-width: 1180px) {
+    .feat-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 1023px) {
+    .pdp-grid {
+      grid-template-columns: 1fr;
+    }
+    .pdp-buy {
+      position: static;
+    }
+    .pg-stage {
+      margin-inline: calc(var(--gutter) * -1 + 6px);
+    }
+    .why-grid {
+      grid-template-columns: 1fr;
+    }
+    .more-list {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 62%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 10px;
+      margin-inline: calc(var(--gutter) * -1);
+      padding-inline: var(--gutter);
+      scroll-padding-inline: var(--gutter);
+    }
+    .more-list li {
+      scroll-snap-align: start;
+    }
+    .pdp-why {
+      border-radius: 24px;
+    }
+  }
+  @media (max-width: 520px) {
+    .feat-list {
+      grid-template-columns: 1fr;
+    }
+    .pg-thumb {
+      width: 60px;
+      height: 60px;
+    }
+    .ticket {
+      transform: none;
+    }
+    .ticket dl div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>

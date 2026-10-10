@@ -1,0 +1,372 @@
+---
+import { url } from '../lib/url';
+import { SITE } from '../data/site';
+interface Props {
+  full?: boolean;
+}
+const { full = false } = Astro.props;
+const Tag = full ? 'h1' : 'h2';
+---
+
+<section id="adini-bas" class:list={['emb', { 'emb--full': full }]} data-emboss aria-labelledby="emb-title">
+  <div class="wrap emb-grid">
+    <div class="emb-copy">
+      <p class="label">İmza · Sıcak gömme baskı</p>
+      <Tag id="emb-title" class="display d-xl" data-reveal="lines">
+        <span class="ln"><span>Adını</span></span>
+        <span class="ln"><span>deriye</span></span>
+        <span class="ln"><span class="brass-text">bas.</span></span>
+      </Tag>
+      <p class="emb-text" data-reveal="fade">
+        Pirinç harfler ısıtılır ve deriye bastırılır. Boya yok, yakma yok: baskı derinin kendi dokusunda kalır; silinmez, akmaz, soyulmaz.
+      </p>
+      <ol class="emb-steps mono" role="list" data-reveal="stagger">
+        <li><b>01</b> Metni yaz — isim, baş harf ya da tarih</li>
+        <li><b>02</b> Basılı tut — pirinç harfler ısınır</li>
+        <li><b>03</b> Bırak — deri harfin şeklini alır</li>
+      </ol>
+    </div>
+
+    <div class="emb-studio" data-reveal="fade">
+      <div class="emb-stage" data-emb-stage>
+        <canvas class="emb-canvas" data-emb-canvas role="img" aria-label="Deri üzerinde sıcak baskı önizlemesi"></canvas>
+        <div class="emb-fallback" data-emb-fallback aria-hidden="true"><span data-emb-fallback-text>BİZON</span></div>
+        <svg class="emb-stitch" aria-hidden="true"><rect x="0" y="0" width="0" height="0"></rect></svg>
+        <div class="emb-type" data-emb-type aria-hidden="true"></div>
+        <p class="emb-hint mono" data-emb-hint aria-hidden="true">Basılı tut · ısıt · bırak</p>
+      </div>
+
+      <form class="emb-controls" data-emb-form>
+        <div class="emb-field">
+          <label for="emb-input" class="label">Baskı metni</label>
+          <div class="emb-input-wrap">
+            <input
+              id="emb-input"
+              name="text"
+              type="text"
+              value="BİZON"
+              maxlength="14"
+              autocomplete="off"
+              spellcheck="false"
+              autocapitalize="characters"
+              data-emb-input
+            />
+            <span class="mono emb-count" data-emb-count>5/14</span>
+          </div>
+        </div>
+
+        <fieldset class="emb-opts">
+          <legend class="label">Deri</legend>
+          <label class="chip"><input type="radio" name="leather" value="yesil" checked /><span><i style="background:#1f4a35"></i>Yeşil</span></label>
+          <label class="chip"><input type="radio" name="leather" value="kahverengi" /><span><i style="background:#7a4a2a"></i>Kahverengi</span></label>
+        </fieldset>
+
+        <fieldset class="emb-opts">
+          <legend class="label">Harf</legend>
+          <label class="chip"><input type="radio" name="face" value="blok" checked /><span>Blok</span></label>
+          <label class="chip"><input type="radio" name="face" value="ince" /><span>İnce</span></label>
+        </fieldset>
+
+        <button type="button" class="btn btn--thread emb-press" data-emb-press>
+          <span class="emb-press-heat" aria-hidden="true"></span>
+          <span data-emb-press-label>Basılı tut, sonra bırak</span>
+        </button>
+        <p class="mono emb-status" role="status" aria-live="polite" data-emb-status></p>
+
+        <div class="emb-after" data-emb-after hidden>
+          <a class="btn" href={url('/urun/veyra/')}>Veyra'da kişiselleştir <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn--ghost" data-emb-mail href={`mailto:${SITE.email}`}>Bu baskıyı iste</a>
+          <button type="button" class="emb-dl mono link-u" data-emb-download>Önizlemeyi indir (PNG)</button>
+        </div>
+        <p class="mono emb-note">
+          Kişiselleştirme Veyra ve seçili cüzdan/kartlık modellerinde yapılır. Kişiselleştirilmiş ürünler iade kapsamı dışındadır.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .emb {
+    position: relative;
+    padding: clamp(100px, 13vw, 190px) 0;
+    background:
+      radial-gradient(60% 50% at 75% 40%, rgb(201 163 90 / 0.08), transparent 70%),
+      var(--ink-2);
+    border-block: 1px solid var(--line);
+  }
+  .emb--full {
+    padding-top: calc(var(--header-h) + clamp(40px, 7vw, 100px));
+    border-top: 0;
+  }
+  .emb-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 90px);
+    align-items: start;
+  }
+  .emb-copy {
+    display: grid;
+    gap: 26px;
+    position: sticky;
+    top: calc(var(--header-h) + 30px);
+  }
+  .brass-text {
+    color: var(--brass);
+  }
+  .emb-text {
+    color: var(--mute);
+    max-width: 36ch;
+  }
+  .emb-steps {
+    display: grid;
+    gap: 10px;
+    color: var(--mute);
+  }
+  .emb-steps b {
+    color: var(--brass);
+    font-weight: 500;
+    margin-right: 10px;
+  }
+
+  .emb-studio {
+    display: grid;
+    gap: 22px;
+  }
+  .emb-stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #0c1a13;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    cursor: grab;
+    box-shadow:
+      0 50px 90px -40px rgb(0 0 0 / 0.95),
+      0 0 0 1px rgb(255 255 255 / 0.05);
+  }
+  .emb-stage.is-heating {
+    cursor: grabbing;
+  }
+  .emb-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .emb-fallback {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    background:
+      radial-gradient(70% 60% at 40% 30%, rgb(255 255 255 / 0.08), transparent 70%),
+      var(--leather, #1f4a35);
+  }
+  .emb-fallback span {
+    font-weight: 800;
+    font-stretch: 125%;
+    font-size: clamp(2rem, 7vw, 5rem);
+    color: rgb(0 0 0 / 0.35);
+    text-shadow:
+      0 1px 0 rgb(255 255 255 / 0.18),
+      0 -1px 1px rgb(0 0 0 / 0.5);
+  }
+  .is-fallback .emb-fallback {
+    display: grid;
+  }
+  .is-fallback .emb-canvas,
+  .is-fallback .emb-type {
+    display: none;
+  }
+  .emb-stitch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .emb-stitch rect {
+    fill: none;
+    stroke: var(--thread);
+    stroke-width: 2.4;
+    stroke-dasharray: 10 7;
+    stroke-linecap: round;
+    filter: drop-shadow(0 1.5px 0.5px rgb(0 0 0 / 0.7));
+  }
+
+  /* Pirinç harf dizisi — damga yüzü aynalı görünür */
+  .emb-type {
+    --heat: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    gap: 0.06em;
+    transform: translate(-50%, -50%) scaleX(-1);
+    pointer-events: none;
+    font-weight: 800;
+    font-stretch: 125%;
+    line-height: 1;
+    white-space: nowrap;
+    filter: drop-shadow(0 calc(30px - var(--heat) * 18px) calc(24px - var(--heat) * 12px) rgb(0 0 0 / 0.65));
+  }
+  .emb-type[data-face='ince'] {
+    font-weight: 600;
+    font-stretch: 87.5%;
+  }
+  .sort {
+    display: grid;
+    place-items: center;
+    padding: 0.14em 0.07em;
+    min-width: 0.5em;
+    border-radius: 0.06em;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.35), transparent 30%),
+      linear-gradient(135deg, #e3c27c, #a9813b 55%, #7b5a22);
+    color: color-mix(in oklab, #6b4c1a, #ff5a1f calc(var(--heat) * 90%));
+    text-shadow:
+      0 -1px 0 rgb(255 255 255 / 0.45),
+      0 1px 1px rgb(0 0 0 / 0.4);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 240 200 / 0.4),
+      inset 0 -0.08em 0.1em rgb(0 0 0 / 0.35),
+      0 0 calc(var(--heat) * 28px) calc(var(--heat) * 4px) rgb(255 110 40 / calc(var(--heat) * 0.55));
+  }
+  .sort.is-space {
+    background: none;
+    box-shadow: none;
+  }
+  .emb-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 22px;
+    text-align: center;
+    color: rgb(232 233 226 / 0.75);
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  .emb-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) auto auto;
+    gap: 18px 22px;
+    align-items: end;
+  }
+  .emb-field {
+    display: grid;
+    gap: 8px;
+  }
+  .emb-input-wrap {
+    position: relative;
+  }
+  .emb-input-wrap input {
+    width: 100%;
+    height: 54px;
+    padding: 0 64px 0 18px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    background: rgb(232 233 226 / 0.04);
+    font-weight: 700;
+    font-stretch: 112%;
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: border-color 0.3s;
+  }
+  .emb-input-wrap input:focus {
+    outline: none;
+    border-color: var(--brass);
+  }
+  .emb-count {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mute);
+  }
+  .emb-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .emb-opts legend {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0;
+  }
+  .emb-press {
+    grid-column: 1 / -1;
+    justify-content: center;
+    min-height: 60px;
+    font-size: 1.05rem;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .emb-press-heat {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, #b8641f, #ff7a2e);
+    transform: scaleX(var(--heat, 0));
+    transform-origin: left;
+  }
+  .emb-status {
+    grid-column: 1 / -1;
+    min-height: 1.5em;
+    color: var(--brass-light);
+  }
+  .emb-after {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .emb-after[hidden] {
+    display: none;
+  }
+  .emb-dl {
+    background-color: transparent;
+    border: 0;
+    color: var(--mute);
+    padding: 10px 4px;
+  }
+  .emb-note {
+    grid-column: 1 / -1;
+    color: var(--mute);
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 1023px) {
+    .emb-grid {
+      grid-template-columns: 1fr;
+    }
+    .emb-copy {
+      position: static;
+    }
+    .emb-stage {
+      aspect-ratio: 4 / 3.4;
+      margin-inline: calc(var(--gutter) * -1 + 6px);
+    }
+    .emb-controls {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .emb-opts legend {
+      margin-bottom: 6px;
+    }
+    .emb-field {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

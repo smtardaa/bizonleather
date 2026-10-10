@@ -1,0 +1,152 @@
+---
+import { url } from '../lib/url';
+import Bison from './Bison.astro';
+import { NAV, SITE } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="ft-call">
+      <p class="label">Soru, kurumsal sipariş ya da kişiselleştirme</p>
+      <a class="ft-mail display" href={`mailto:${SITE.email}`} data-stretch>
+        <span>Bize yazın</span><span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <p class="mono ft-mail-raw">{SITE.email} · 1–2 iş günü içinde dönüş</p>
+    </div>
+
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <Bison class="ft-mark" />
+        <p class="mono">
+          Eskişehir'deki atölyemizde %100 hakiki sığır derisinden, elde kesilip dikilir.
+        </p>
+      </div>
+      <nav aria-label="Alt menü — sayfalar">
+        <p class="label">Sayfalar</p>
+        <ul role="list">
+          {NAV.map((n) => <li><a class="link-u" href={url(n.href)}>{n.label}</a></li>)}
+        </ul>
+      </nav>
+      <nav aria-label="Alt menü — yardım">
+        <p class="label">Yardım</p>
+        <ul role="list">
+          <li><a class="link-u" href={url('/teslimat-ve-iade/')}>Teslimat & İade</a></li>
+          <li><a class="link-u" href={url('/sss/#bakim')}>Deri bakımı</a></li>
+          <li><a class="link-u" href={url('/gizlilik/')}>Gizlilik Politikası</a></li>
+        </ul>
+      </nav>
+      <div>
+        <p class="label">Atölye</p>
+        <ul role="list">
+          <li><a class="link-u" href={SITE.instagramUrl} target="_blank" rel="noopener">Instagram @{SITE.instagram}</a></li>
+          <li><a class="link-u" href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+          <li class="mute">{SITE.hours}</li>
+          <li class="mute">{SITE.city}, Türkiye</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ft-base mono">
+      <span>© {year} Bizon Leather</span>
+      <span class="ft-seam stitch-line" aria-hidden="true"></span>
+      <span>El yapımı · Hakiki deri</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    padding: clamp(80px, 12vw, 160px) 0 28px;
+    background: var(--ink);
+    border-top: 1px solid var(--line);
+  }
+  .ft-call {
+    display: grid;
+    gap: 18px;
+    padding-bottom: clamp(56px, 8vw, 110px);
+  }
+  .ft-mail {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.12em;
+    width: fit-content;
+    font-size: clamp(3.4rem, 13vw, 13rem);
+    padding-top: 0.1em;
+    text-decoration: none;
+    transition: font-stretch 0.8s var(--ease-settle), color 0.3s;
+  }
+  .ft-mail .arrow {
+    font-size: 0.4em;
+    color: var(--thread-light);
+    transition: transform 0.6s var(--ease-settle);
+  }
+  .ft-mail:hover,
+  .ft-mail:focus-visible {
+    font-stretch: 100%;
+  }
+  .ft-mail:hover .arrow {
+    transform: translate(6px, -6px);
+  }
+  .ft-mail-raw {
+    color: var(--mute);
+  }
+  .ft-grid {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+    gap: 40px;
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+  }
+  .ft-grid ul {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .ft-grid a {
+    text-decoration: none;
+  }
+  .ft-brand {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+    max-width: 30ch;
+    color: var(--mute);
+  }
+  :global(.ft-mark) {
+    width: 64px;
+    color: var(--chalk);
+  }
+  .mute {
+    color: var(--mute);
+  }
+  .ft-base {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 22px;
+    color: var(--mute);
+  }
+  .ft-seam {
+    flex: 1;
+    opacity: 0.7;
+  }
+  @media (max-width: 900px) {
+    .ft-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .ft-brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 520px) {
+    .ft-base {
+      flex-wrap: wrap;
+    }
+    .ft-seam {
+      order: -1;
+      flex-basis: 100%;
+    }
+  }
+</style>

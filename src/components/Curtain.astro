@@ -1,0 +1,66 @@
+---
+import Bison from './Bison.astro';
+---
+
+<!-- Sayfa geçişi: dikişli kenarı olan bir deri kapak ekranı süpürür. -->
+<div class="curtain" aria-hidden="true" data-curtain transition:persist="curtain">
+  <div class="curtain-panel">
+    <svg class="curtain-seam" preserveAspectRatio="none" viewBox="0 0 100 4">
+      <line x1="0" y1="2" x2="100" y2="2" vector-effect="non-scaling-stroke"></line>
+    </svg>
+    <Bison class="curtain-mark" />
+    <span class="curtain-label mono" data-curtain-label></span>
+  </div>
+</div>
+
+<style is:global>
+  .curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .curtain.is-active {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .curtain-panel {
+    position: absolute;
+    inset: -8vh 0;
+    background:
+      radial-gradient(120% 70% at 50% 50%, rgb(255 255 255 / 0.04), transparent 70%),
+      var(--forest);
+    display: grid;
+    place-items: center;
+    border-radius: 28px 28px 0 0;
+  }
+  .curtain-seam {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    right: 20px;
+    width: calc(100% - 40px);
+    height: 4px;
+    overflow: visible;
+  }
+  .curtain-seam line {
+    stroke: var(--thread);
+    stroke-width: 2.5;
+    stroke-dasharray: 9 7;
+  }
+  .curtain-mark {
+    width: clamp(56px, 7vw, 92px);
+    color: var(--chalk);
+    opacity: 0.9;
+  }
+  .curtain-label {
+    position: absolute;
+    bottom: calc(8vh + 32px);
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--mute);
+    text-transform: uppercase;
+  }
+</style>

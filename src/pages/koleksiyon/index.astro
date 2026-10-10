@@ -1,0 +1,317 @@
+---
+import { url } from '../../lib/url';
+import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import { products, sets, img, tl, productUrl, colorsOf, COLORS, brandHtml } from '../../data/products';
+
+const cats = [
+  { key: 'tumu', label: 'Tümü' },
+  { key: 'cuzdan', label: 'Cüzdan' },
+  { key: 'ajanda', label: 'Ajanda kılıfı' },
+  { key: 'matara', label: 'Matara' },
+  { key: 'set', label: 'Hediye setleri' },
+];
+const widths = [7, 5, 5, 7, 6, 6];
+const counts: Record<string, number> = {
+  tumu: products.length + sets.length,
+  cuzdan: products.filter((p) => p.category === 'cuzdan').length,
+  ajanda: products.filter((p) => p.category === 'ajanda').length,
+  matara: products.filter((p) => p.category === 'matara').length,
+  set: sets.length,
+};
+---
+
+<Layout title="Koleksiyon" description="Bizon Leather koleksiyonu: el yapımı hakiki deri cüzdanlar, ajanda kılıfı, deri kaplı matara ve hediye setleri." page="collection">
+  <section class="col-hero wrap" aria-labelledby="col-title">
+    <p class="label">Koleksiyon · Eskişehir'de elde yapılır</p>
+    <h1 id="col-title" class="display d-xxl" data-reveal="lines">
+      <span class="ln"><span>Koleksiyon</span></span>
+    </h1>
+    <div class="col-bar">
+      <p class="col-intro">
+        Hakiki sığır derisinden cüzdanlar, ajanda kılıfı ve matara. Çoğu model yeşil ve kahverengi iki tonda. Açılışa özel tüm ürünlerde %10 indirim.
+      </p>
+      <div class="filters" role="group" aria-label="Kategori filtresi" data-filters>
+        {
+          cats.map((c, i) => (
+            <button type="button" class="filter" data-filter={c.key} aria-pressed={i === 0 ? 'true' : 'false'}>
+              {c.label}
+              <sup class="mono">{counts[c.key]}</sup>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" aria-label="Ürünler" data-collection>
+    <p class="sr-only" aria-live="polite" data-col-status></p>
+    <ul class="col-grid" role="list" data-col-grid>
+      {
+        products.map((p, i) => {
+          const cs = colorsOf(p);
+          const a = p.variants[0];
+          const b = p.variants[1];
+          return (
+            <li class={`col-item w${widths[i]}`} data-cat={p.category}>
+              <a class="ci-link" href={productUrl(p)} data-dye>
+                <span class="ci-media">
+                  <Image class="ci-a" src={img(a.images[0])} alt={`${p.name} — ${p.kind}`} widths={[480, 760, 1100]} sizes={`(min-width: 1024px) ${Math.round((widths[i] / 12) * 100)}vw, 100vw`} loading={i < 2 ? 'eager' : 'lazy'} />
+                  {b ? (
+                    <Image class="ci-b" src={img(b.images[0])} alt="" widths={[480, 760, 1100]} sizes={`(min-width: 1024px) ${Math.round((widths[i] / 12) * 100)}vw, 100vw`} loading="lazy" />
+                  ) : (
+                    <Image class="ci-b" src={img(a.images[1] ?? a.images[0])} alt="" widths={[480, 760, 1100]} sizes={`(min-width: 1024px) ${Math.round((widths[i] / 12) * 100)}vw, 100vw`} loading="lazy" />
+                  )}
+                  {b?.color && <span class="ci-hint mono">Üzerine gel: {COLORS[b.color].label.toLowerCase()}</span>}
+                </span>
+                <span class="ci-info">
+                  <span class="ci-no mono">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="ci-name display">{p.name}</span>
+                  <span class="ci-kind mono">{p.kind}</span>
+                  <span class="ci-meta">
+                    {cs.length > 0 && (
+                      <span class="swatches" aria-label={`Renkler: ${cs.map((c) => COLORS[c].label).join(', ')}`}>
+                        {cs.map((c) => (
+                          <i style={`background:${COLORS[c].swatch}`} />
+                        ))}
+                      </span>
+                    )}
+                    <span class="price">
+                      <s>{tl(p.compareAt)}</s>
+                      {tl(p.price)}
+                    </span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          );
+        })
+      }
+      {
+        sets.map((s, i) => (
+          <li class="col-item w4 col-set" data-cat="set">
+            <a class="ci-link" href={url(`/hediye-setleri/#${s.slug}`)}>
+              <span class="ci-media ci-media--set">
+                <Image class="ci-a" src={img(s.image)} alt={`${s.name} hediye seti`} widths={[480, 760]} sizes="(min-width: 1024px) 33vw, 100vw" loading="lazy" />
+              </span>
+              <span class="ci-info">
+                <span class="ci-no mono">S{i + 1}</span>
+                <span class="ci-name display ci-name--set" set:html={brandHtml(s.name)} />
+                <span class="ci-kind mono">Hediye seti{s.note ? ` · ${s.note}` : ''}</span>
+                <span class="ci-meta">
+                  <span class="price">{tl(s.price)}</span>
+                </span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .col-hero {
+    padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
+    padding-bottom: clamp(40px, 5vw, 70px);
+    display: grid;
+    gap: 22px;
+  }
+  .col-hero h1 {
+    margin-left: -0.04em;
+  }
+  .col-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 36ch) 1fr;
+    gap: 24px 40px;
+    align-items: end;
+  }
+  .col-intro {
+    color: var(--mute);
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .filter {
+    position: relative;
+    height: 46px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--line);
+    font-weight: 600;
+    font-stretch: 90%;
+    transition:
+      background 0.3s,
+      color 0.3s,
+      box-shadow 0.3s;
+  }
+  .filter sup {
+    font-size: 0.65rem;
+    margin-left: 4px;
+    color: var(--mute);
+  }
+  .filter:hover {
+    box-shadow: inset 0 0 0 1.5px rgb(232 233 226 / 0.4);
+  }
+  .filter[aria-pressed='true'] {
+    background: var(--chalk);
+    color: var(--ink);
+    box-shadow: none;
+  }
+  .filter[aria-pressed='true'] sup {
+    color: var(--thread-ink);
+  }
+
+  .col-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(36px, 5vw, 70px) clamp(16px, 2vw, 28px);
+    padding-bottom: clamp(90px, 12vw, 160px);
+  }
+  .col-item[hidden] {
+    display: none;
+  }
+  .w7 {
+    grid-column: span 7;
+  }
+  .w5 {
+    grid-column: span 5;
+  }
+  .w6 {
+    grid-column: span 6;
+  }
+  .w4 {
+    grid-column: span 4;
+  }
+  .w5 .ci-media {
+    aspect-ratio: 4 / 5;
+  }
+  .w5:nth-child(2) {
+    margin-top: 14vw;
+  }
+  .ci-link {
+    display: grid;
+    gap: 16px;
+    text-decoration: none;
+  }
+  .ci-media {
+    position: relative;
+    display: block;
+    aspect-ratio: 5 / 4;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #000;
+  }
+  .w7 .ci-media {
+    aspect-ratio: 7 / 6;
+  }
+  .ci-media--set {
+    aspect-ratio: 4 / 3;
+  }
+  .ci-media :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-settle);
+  }
+  .ci-media :global(.ci-b) {
+    clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
+  }
+  .ci-link:hover .ci-media :global(img) {
+    transform: scale(1.04);
+  }
+  .ci-hint {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgb(6 8 7 / 0.6);
+    color: var(--mute);
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.4s,
+      transform 0.5s var(--ease-settle);
+  }
+  .ci-link:hover .ci-hint {
+    opacity: 1;
+    transform: none;
+  }
+  .ci-info {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'no name meta' 'no kind meta';
+    gap: 2px 16px;
+    align-items: baseline;
+  }
+  .ci-no {
+    grid-area: no;
+    color: var(--thread-light);
+  }
+  .ci-name {
+    grid-area: name;
+    font-size: clamp(2.2rem, 4vw, 4rem);
+    line-height: 0.95;
+    transition: font-stretch 0.7s var(--ease-settle);
+  }
+  .ci-name--set {
+    font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+  }
+  .ci-link:hover .ci-name,
+  .ci-link:focus-visible .ci-name {
+    font-stretch: 112%;
+  }
+  .ci-kind {
+    grid-area: kind;
+    color: var(--mute);
+  }
+  .ci-meta {
+    grid-area: meta;
+    display: grid;
+    justify-items: end;
+    gap: 8px;
+  }
+  .col-set:first-of-type {
+    grid-column-start: 1;
+  }
+
+  @media (max-width: 1023px) {
+    .col-bar {
+      grid-template-columns: 1fr;
+    }
+    .filters {
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-inline: calc(var(--gutter) * -1);
+      padding-inline: var(--gutter);
+      scrollbar-width: none;
+    }
+    .filter {
+      flex: none;
+    }
+    .col-grid {
+      grid-template-columns: 1fr;
+    }
+    .col-item {
+      grid-column: auto !important;
+      margin-top: 0 !important;
+    }
+    .ci-media,
+    .w5 .ci-media,
+    .w7 .ci-media {
+      aspect-ratio: 1 / 1;
+    }
+    .ci-hint {
+      display: none;
+    }
+  }
+</style>

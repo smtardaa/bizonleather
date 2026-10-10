@@ -1,0 +1,182 @@
+---
+import { url } from '../lib/url';
+import Layout from '../layouts/Layout.astro';
+import { FAQ, SITE } from '../data/site';
+const slug = (s: string) =>
+  s
+    .toLocaleLowerCase('tr-TR')
+    .replace(/ı/g, 'i')
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+const total = FAQ.reduce((n, g) => n + g.items.length, 0);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.flatMap((g) =>
+    g.items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  ),
+};
+---
+
+<Layout title="Sık Sorulan Sorular" description="Bizon Leather hakkında sık sorulan sorular: hakiki deri, kişiselleştirme, kargo, iade ve deri bakımı." page="faq" jsonLd={jsonLd}>
+  <div class="faq-page" data-faq>
+    <header class="faq-hero wrap">
+      <p class="label">{total} soru · {FAQ.length} başlık</p>
+      <h1 class="display d-xxl" data-reveal="lines"><span class="ln"><span>Sorular</span></span></h1>
+      <div class="faq-search">
+        <label for="faq-q" class="sr-only">Sorularda ara</label>
+        <input id="faq-q" type="search" placeholder="Ara: kargo, baskı, bakım…" autocomplete="off" data-faq-q />
+        <span class="mono" data-faq-count aria-live="polite"></span>
+      </div>
+    </header>
+
+    <div class="wrap faq-grid">
+      <nav class="faq-nav" aria-label="Başlıklar">
+        <ul role="list">
+          {FAQ.map((g) => <li><a class="link-u" href={`#${slug(g.group)}`}>{g.group}</a></li>)}
+        </ul>
+      </nav>
+      <div class="faq-groups">
+        {
+          FAQ.map((g) => (
+            <section class="faq-group" id={slug(g.group)} aria-labelledby={`g-${slug(g.group)}`} data-faq-group>
+              <h2 id={`g-${slug(g.group)}`} class="display d-m">
+                {g.group}
+              </h2>
+              <div>
+                {g.items.map((f) => (
+                  <details class="qa" data-faq-item>
+                    <summary>
+                      <span>{f.q}</span>
+                      <i aria-hidden="true" />
+                    </summary>
+                    <p>{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          ))
+        }
+        <p class="faq-empty mono" data-faq-empty hidden>Sonuç yok. Sorunuzu doğrudan bize yazın.</p>
+        <div class="faq-more">
+          <p class="display d-s">Cevabı bulamadınız mı?</p>
+          <a class="btn" href={url('/iletisim/')}>Bize yazın <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="mono link-u" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .faq-hero {
+    padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
+    padding-bottom: clamp(40px, 6vw, 80px);
+    display: grid;
+    gap: 22px;
+  }
+  .faq-hero h1 {
+    margin-left: -0.04em;
+  }
+  .faq-search {
+    position: relative;
+    max-width: 640px;
+  }
+  .faq-search input {
+    width: 100%;
+    height: 60px;
+    padding: 0 110px 0 22px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: rgb(232 233 226 / 0.04);
+    font-size: 1.05rem;
+  }
+  .faq-search input:focus {
+    outline: none;
+    border-color: var(--thread);
+  }
+  .faq-search .mono {
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mute);
+  }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px clamp(40px, 6vw, 100px);
+    padding-bottom: clamp(90px, 12vw, 160px);
+  }
+  .faq-nav ul {
+    position: sticky;
+    top: calc(var(--header-h) + 30px);
+    display: grid;
+    gap: 10px;
+  }
+  .faq-nav a {
+    text-decoration: none;
+    color: var(--mute);
+    font-weight: 600;
+    font-stretch: 90%;
+  }
+  .faq-nav a:hover {
+    color: var(--chalk);
+  }
+  .faq-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding-bottom: 60px;
+    scroll-margin-top: calc(var(--header-h) + 20px);
+  }
+  .faq-group[hidden] {
+    display: none;
+  }
+  .faq-group :global(.qa[hidden]) {
+    display: none;
+  }
+  .faq-more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px 24px;
+    padding: 34px;
+    border-radius: 24px;
+    background: var(--forest);
+  }
+  .faq-more .display {
+    flex-basis: 100%;
+  }
+  .faq-empty {
+    padding: 30px 0;
+    color: var(--mute);
+  }
+  :global(mark) {
+    background: rgb(59 92 255 / 0.35);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+  @media (max-width: 900px) {
+    .faq-grid {
+      grid-template-columns: 1fr;
+    }
+    .faq-nav ul {
+      position: static;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 18px;
+      padding-bottom: 6px;
+    }
+    .faq-nav a {
+      white-space: nowrap;
+    }
+  }
+</style>

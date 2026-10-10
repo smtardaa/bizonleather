@@ -1,0 +1,268 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { sets, img, tl, storeUrl, ITEM_LABEL } from '../data/products';
+interface Props {
+  full?: boolean;
+}
+const { full = false } = Astro.props;
+const Tag = full ? 'h1' : 'h2';
+const data = await Promise.all(
+  sets.map(async (s) => ({
+    ...s,
+    thumb: (await getImage({ src: img(s.image), width: 160, height: 160, fit: 'cover', format: 'webp' })).src,
+    store: storeUrl(s.handle),
+  })),
+);
+const keys = ['cuzdan', 'matara', 'zippo'] as const;
+---
+
+<section class:list={['sets', { 'sets--full': full }]} data-setbuilder aria-labelledby="sets-title">
+  <div class="wrap">
+    <header class="sets-head">
+      <p class="label">Hediye setleri · Kutusunda, hediyeye hazır</p>
+      <Tag id="sets-title" class="display d-xl" data-reveal="lines">
+        <span class="ln"><span>Bambaşka bi'</span></span>
+        <span class="ln"><span>hediye.</span></span>
+      </Tag>
+    </header>
+
+    <div class="sets-grid">
+      <div class="sets-pick">
+        <p class="mono sets-q" id="sets-q">Parçaları seç — set kendiliğinden oluşur.</p>
+        <div class="eq" role="group" aria-labelledby="sets-q">
+          {
+            keys.map((k, i) => (
+              <>
+                {i > 0 && (
+                  <span class="eq-plus display" aria-hidden="true">
+                    +
+                  </span>
+                )}
+                <button type="button" class="eq-item display" data-item={k} aria-pressed={k !== 'zippo' ? 'true' : 'false'}>
+                  <span class="eq-label" lang={k === 'zippo' ? 'en' : undefined}>{ITEM_LABEL[k]}</span>
+                </button>
+              </>
+            ))
+          }
+        </div>
+
+        <div class="eq-result" aria-live="polite">
+          <span class="eq-eq display" aria-hidden="true">=</span>
+          <span class="eq-price display" data-set-price>{tl(sets[0].price)}</span>
+        </div>
+
+        <div class="eq-variants" role="radiogroup" aria-label="Cüzdan seçeneği" data-set-variants hidden></div>
+        <p class="mono sets-msg" data-set-msg></p>
+
+        <div class="sets-cta">
+          <button type="button" class="btn btn--thread" data-set-add>Sepete ekle <span class="arrow" aria-hidden="true">+</span></button>
+          <a class="mono link-u" data-set-store href={data[0].store} target="_blank" rel="noopener">Mağaza sayfasında gör ↗</a>
+        </div>
+        <p class="mono sets-note">Ürünler kendi özel kutusunda gönderilir. İsteğe bağlı hediye notu için sipariş sonrası bize yazabilirsiniz.</p>
+      </div>
+
+      <figure class="sets-box" data-set-box>
+        {
+          sets.map((s, i) => (
+            <div class:list={['sb-slide', { 'is-on': i === 0 }]} data-set-slide={s.slug}>
+              <Image src={img(s.image)} alt={`${s.name} hediye seti, kraft kutusunda`} widths={[560, 840, 1200]} sizes="(min-width: 1024px) 50vw, 100vw" loading="lazy" />
+            </div>
+          ))
+        }
+        <figcaption class="mono" data-set-cap>{sets[0].name}</figcaption>
+      </figure>
+    </div>
+  </div>
+  <script type="application/json" data-set-json set:html={JSON.stringify(data)} />
+</section>
+
+<style is:global>
+  .sets {
+    position: relative;
+    padding: clamp(100px, 13vw, 180px) 0;
+    background: var(--forest);
+    overflow: clip;
+  }
+  .sets--full {
+    padding-top: calc(var(--header-h) + clamp(40px, 7vw, 100px));
+  }
+  .sets-head {
+    display: grid;
+    gap: 22px;
+    margin-bottom: clamp(40px, 6vw, 80px);
+  }
+  .sets-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+  }
+  .sets-pick {
+    display: grid;
+    gap: 22px;
+    align-content: start;
+  }
+  .sets-q {
+    color: var(--mute);
+  }
+  .eq {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.18em;
+    font-size: clamp(2.6rem, 4.8vw, 5rem);
+  }
+  .eq-plus,
+  .eq-eq {
+    color: var(--thread-light);
+    font-stretch: 100%;
+  }
+  .eq-item {
+    position: relative;
+    border: 0;
+    padding: 0.04em 0.08em 0;
+    background: none;
+    font-size: inherit;
+    line-height: 0.95;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(232 233 226 / 0.55);
+    transition:
+      color 0.45s var(--ease-settle),
+      font-stretch 0.7s var(--ease-settle),
+      -webkit-text-stroke-color 0.3s;
+  }
+  .eq-item:hover {
+    -webkit-text-stroke-color: var(--chalk);
+  }
+  .eq-item[aria-pressed='true'] {
+    color: var(--chalk);
+    -webkit-text-stroke-color: transparent;
+    font-stretch: 100%;
+  }
+  .eq-item::after {
+    /* seçili parçanın altına dikiş */
+    content: '';
+    position: absolute;
+    left: 0.08em;
+    right: 0.08em;
+    bottom: -0.06em;
+    height: 3px;
+    background-image: linear-gradient(90deg, var(--thread-light) 0 60%, transparent 60%);
+    background-size: 10px 3px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-cut);
+  }
+  .eq-item[aria-pressed='true']::after {
+    transform: none;
+  }
+  .eq-result {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25em;
+    font-size: clamp(2.6rem, 4.8vw, 5rem);
+    line-height: 1;
+  }
+  .eq-price {
+    font-stretch: 125%;
+    font-variant-numeric: tabular-nums;
+  }
+  .eq-result.is-empty .eq-price {
+    color: var(--mute);
+  }
+  .eq-variants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .eq-variants[hidden] {
+    display: none;
+  }
+  .eq-variants button {
+    display: inline-grid;
+    gap: 2px;
+    text-align: left;
+    padding: 10px 16px;
+    border-radius: 14px;
+    border: 0;
+    background: rgb(232 233 226 / 0.06);
+    box-shadow: inset 0 0 0 1.5px var(--line);
+  }
+  .eq-variants button[aria-checked='true'] {
+    box-shadow: inset 0 0 0 1.5px var(--chalk);
+    background: rgb(232 233 226 / 0.12);
+  }
+  .eq-variants b {
+    font-weight: 700;
+    font-stretch: 90%;
+  }
+  .sets-msg {
+    min-height: 1.5em;
+    color: var(--brass-light);
+  }
+  .sets-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 24px;
+  }
+  .sets-cta a {
+    color: var(--mute);
+    text-decoration: none;
+  }
+  .sets-note {
+    color: var(--mute);
+    font-size: 0.7rem;
+    max-width: 52ch;
+  }
+  .sets-box {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #000;
+  }
+  .sb-slide {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+  }
+  .sb-slide.is-on {
+    visibility: visible;
+  }
+  .sb-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sets-box figcaption {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgb(6 8 7 / 0.7);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    z-index: 3;
+  }
+  .sets-box.is-empty .sb-slide {
+    filter: grayscale(1) brightness(0.35);
+    transition: filter 0.6s;
+  }
+
+  @media (max-width: 1023px) {
+    .sets-grid {
+      grid-template-columns: 1fr;
+    }
+    .sets-box {
+      order: -1;
+      aspect-ratio: 4 / 3;
+    }
+    .eq,
+    .eq-result {
+      font-size: clamp(2.2rem, 11.5vw, 4.4rem);
+    }
+  }
+</style>

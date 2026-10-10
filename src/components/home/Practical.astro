@@ -1,0 +1,115 @@
+---
+import { url } from '../../lib/url';
+import { FAQ } from '../../data/site';
+const facts = [
+  { big: '1–3', unit: 'iş günü', text: 'Siparişiniz özenle paketlenip kargoya verilir.' },
+  { big: '3.000', unit: 'TL üzeri', text: 'Türkiye geneli kargo ücretsiz.' },
+  { big: '14', unit: 'gün', text: 'Kişiselleştirilmemiş ürünlerde iade ve değişim.' },
+  { big: 'Kutu', unit: 'hediyeye hazır', text: 'Her ürün kendi özel kutusunda gönderilir.' },
+];
+const pickQ = (g: string, i: number) => FAQ.find((f) => f.group === g)!.items[i];
+const faqs = [pickQ('Deri', 0), pickQ('Kişiselleştirme', 2), pickQ('Bakım', 0)];
+---
+
+<section class="prac" aria-labelledby="prac-title">
+  <div class="wrap">
+    <h2 id="prac-title" class="sr-only">Sipariş ve teslimat</h2>
+    <ul class="facts" role="list" data-reveal="stagger">
+      {
+        facts.map((f) => (
+          <li class="fact">
+            <span class="fact-big display">{f.big}</span>
+            <span class="fact-unit mono">{f.unit}</span>
+            <span class="fact-text">{f.text}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="prac-faq">
+      <div class="prac-faq-head">
+        <p class="label">Sık sorulanlar</p>
+        <h3 class="display d-l" data-reveal="lines">
+          <span class="ln"><span>Merak</span></span>
+          <span class="ln"><span>edilenler.</span></span>
+        </h3>
+        <a class="btn btn--ghost" href={url('/sss/')} data-reveal="fade">Tüm sorular <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+      <div class="prac-faq-list">
+        {
+          faqs.map((f) => (
+            <details class="qa">
+              <summary>
+                <span>{f.q}</span>
+                <i aria-hidden="true" />
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .prac {
+    padding: clamp(90px, 12vw, 170px) 0 clamp(60px, 8vw, 100px);
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+  .fact {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding: 28px 22px 30px 0;
+    border-right: 1px solid var(--line);
+    margin-right: 22px;
+  }
+  .fact:last-child {
+    border-right: 0;
+  }
+  .fact-big {
+    font-size: clamp(3rem, 6vw, 5.6rem);
+    line-height: 0.9;
+  }
+  .fact-unit {
+    color: var(--thread-light);
+    text-transform: uppercase;
+  }
+  .fact-text {
+    color: var(--mute);
+    max-width: 24ch;
+    margin-top: 8px;
+  }
+  .prac-faq {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: clamp(32px, 6vw, 100px);
+    margin-top: clamp(90px, 12vw, 170px);
+  }
+  .prac-faq-head {
+    display: grid;
+    gap: 22px;
+    align-content: start;
+    justify-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+    }
+    .fact:nth-child(2) {
+      border-right: 0;
+    }
+    .fact:nth-child(n + 3) {
+      border-top: 1px solid var(--line);
+    }
+    .prac-faq {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

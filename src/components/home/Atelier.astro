@@ -1,0 +1,256 @@
+---
+import { url } from '../../lib/url';
+import { Image } from 'astro:assets';
+import { img } from '../../data/products';
+
+// Odak noktaları atölye fotoğrafındaki gerçek aletlere karşılık gelir (oran olarak).
+const steps = [
+  {
+    no: '01',
+    title: 'Kesim',
+    tool: 'Deri bıçağı',
+    focus: [0.13, 0.8],
+    text: "Hakiki sığır derisi, İstanbul merkezli köklü tabakhane Akgün Deri'den gelir. Her parça Eskişehir'deki atölyede elde kesilir.",
+  },
+  {
+    no: '02',
+    title: 'Şekillendirme',
+    tool: 'Tokmak',
+    focus: [0.86, 0.55],
+    text: 'Naylon ya da kumaş astar yok. Form, derinin kendi yapısıyla verilir; ürünün tamamı deridir.',
+  },
+  {
+    no: '03',
+    title: 'Dikiş',
+    tool: 'Mumlu iplik',
+    focus: [0.16, 0.41],
+    text: 'Her dikiş elde, geleneksel saraç dikişiyle kilitlenir. Bir ilmek kopsa bile dikiş sökülmez.',
+  },
+  {
+    no: '04',
+    title: 'Perdah',
+    tool: 'Bakım kremi',
+    focus: [0.92, 0.72],
+    text: 'Son dokunuş da elde yapılır. Sonrası sizde: ara sıra doğal vazelin ya da deri bakım kremi, yumuşak bir bezle dairesel hareketlerle.',
+  },
+];
+---
+
+<section class="atl chalk" data-atelier aria-labelledby="atl-title">
+  <div class="wrap">
+    <header class="atl-head">
+      <p class="label">Atölye · Eskişehir</p>
+      <h2 id="atl-title" class="display d-xl" data-reveal="lines">
+        <span class="ln"><span>Dört iş,</span></span>
+        <span class="ln"><span>dört el<span class="thread-text">.</span></span></span>
+      </h2>
+      <p class="atl-intro" data-reveal="fade">
+        Bizon Leather, 2026'da Eskişehir'de iki arkadaşın ortak fikriyle kuruldu. Tasarımdan son dikişe kadar her şey kendi atölyemizde,
+        elle yapılır.
+      </p>
+    </header>
+
+    <div class="atl-body">
+      <div class="atl-panel" data-atl-panel>
+        <div class="atl-frame">
+          <div class="atl-cam" data-atl-cam>
+            <Image src={img('atolye')} alt="Bizon Leather atölye masası: deri bıçakları, tokmak, mumlu iplik makaraları, perçinler ve bakım kremi arasında cüzdan, matara ve ajanda kılıfı." widths={[640, 960, 1293]} sizes="(min-width: 1024px) 50vw, 100vw" loading="lazy" />
+          </div>
+          <span class="atl-spot" data-atl-spot aria-hidden="true"></span>
+          <span class="atl-ring" aria-hidden="true"></span>
+          <span class="atl-tag mono" data-atl-tag aria-hidden="true">Deri bıçağı</span>
+        </div>
+        <div class="atl-progress mono" aria-hidden="true">
+          {steps.map((s) => <span data-atl-dot>{s.no}</span>)}
+        </div>
+      </div>
+
+      <ol class="atl-steps" role="list">
+        {
+          steps.map((s) => (
+            <li class="atl-step" data-atl-step data-fx={s.focus[0]} data-fy={s.focus[1]} data-tool={s.tool}>
+              <span class="atl-no display">{s.no}</span>
+              <h3 class="display d-m">{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="atl-foot" data-reveal="fade">
+      <a class="btn btn--ink" href={url('/atolye/')}>Atölyeyi tanı <span class="arrow" aria-hidden="true">→</span></a>
+      <span class="mono">%100 hakiki sığır derisi · Astarsız · Saraç dikişi</span>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .atl {
+    position: relative;
+    padding: clamp(100px, 13vw, 180px) 0 clamp(80px, 10vw, 140px);
+    border-radius: 36px 36px 0 0;
+  }
+  .atl-head {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 34ch);
+    align-items: end;
+    gap: 22px 40px;
+    margin-bottom: clamp(48px, 7vw, 100px);
+  }
+  .atl-head .label {
+    grid-column: 1 / -1;
+  }
+  .atl-intro {
+    color: var(--mute-ink);
+  }
+  .atl-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 110px);
+    align-items: start;
+  }
+  .atl-panel {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+    display: grid;
+    gap: 14px;
+  }
+  .atl-frame {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    max-height: calc(100svh - var(--header-h) - 90px);
+    border-radius: 24px;
+    overflow: hidden;
+    background: #0b0a09;
+  }
+  .atl-cam {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  .atl-cam img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .atl-spot {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--x, 50%) var(--y, 50%),
+      transparent 0,
+      transparent var(--r, 120px),
+      rgb(6 8 7 / 0.78) calc(var(--r, 120px) + 90px)
+    );
+  }
+  .atl-ring {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    width: calc(var(--r, 120px) * 2 + 24px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px dashed var(--thread);
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+    opacity: var(--ring, 0);
+    pointer-events: none;
+    filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.6));
+  }
+  .atl-tag {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    transform: translate(-50%, calc(var(--r, 120px) * -1 - 34px));
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--chalk);
+    color: var(--ink);
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+  }
+  .atl-progress {
+    display: flex;
+    gap: 14px;
+    color: var(--mute-ink);
+  }
+  .atl-progress span {
+    transition: color 0.3s;
+  }
+  .atl-progress span.is-on {
+    color: var(--thread-ink);
+  }
+  .atl-steps {
+    display: grid;
+  }
+  .atl-step {
+    min-height: 72svh;
+    display: grid;
+    align-content: center;
+    gap: 16px;
+    padding: 6vh 0;
+    border-top: 1px solid var(--line-ink);
+    opacity: 0.28;
+    transition: opacity 0.6s;
+  }
+  .atl-step.is-on {
+    opacity: 1;
+  }
+  .atl-step:first-child {
+    border-top: 0;
+  }
+  .atl-no {
+    font-size: 1rem;
+    color: var(--thread-ink);
+    font-stretch: 125%;
+  }
+  .atl-step p {
+    max-width: 38ch;
+    font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+    line-height: 1.45;
+  }
+  .atl-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 28px;
+    margin-top: 40px;
+    color: var(--mute-ink);
+  }
+  .no-js .atl-step,
+  html:not(.js) .atl-step {
+    opacity: 1;
+  }
+
+  @media (max-width: 1023px) {
+    .atl {
+      border-radius: 24px 24px 0 0;
+    }
+    .atl-head {
+      grid-template-columns: 1fr;
+    }
+    .atl-body {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .atl-panel {
+      top: calc(var(--header-h) + 8px);
+      z-index: 2;
+      background: var(--chalk);
+      padding-bottom: 12px;
+      margin-inline: calc(var(--gutter) * -1);
+      padding-inline: var(--gutter);
+    }
+    .atl-frame {
+      aspect-ratio: 16 / 11;
+      max-height: 38svh;
+      width: 100%;
+    }
+    .atl-step {
+      min-height: 58svh;
+    }
+  }
+</style>

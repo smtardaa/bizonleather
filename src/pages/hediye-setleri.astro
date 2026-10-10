@@ -1,0 +1,150 @@
+---
+import { url } from '../lib/url';
+import { Image, getImage } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import SetBuilder from '../components/SetBuilder.astro';
+import { sets, img, tl, storeUrl, ITEM_LABEL, brandHtml } from '../data/products';
+
+const rows = await Promise.all(
+  sets.map(async (s) => ({
+    ...s,
+    thumb: (await getImage({ src: img(s.image), width: 160, height: 160, fit: 'cover', format: 'webp' })).src,
+  })),
+);
+---
+
+<Layout title="Hediye Setleri" description="Bizon Leather hediye setleri: cüzdan, matara ve Zippo kombinasyonları; kendi kutusunda, hediyeye hazır." image="set-uclu" page="sets">
+  <SetBuilder full />
+
+  <section class="all-sets wrap" aria-labelledby="all-sets-title">
+    <h2 id="all-sets-title" class="display d-l" data-reveal="lines"><span class="ln"><span>Tüm setler</span></span></h2>
+    <ol class="as-list" role="list">
+      {
+        rows.map((s, i) => (
+          <li class="as-row" id={s.slug} data-reveal="fade">
+            <span class="as-no mono">S{i + 1}</span>
+            <span class="as-img">
+              <Image src={img(s.image)} alt={`${s.name} hediye seti`} widths={[360, 600]} sizes="(min-width: 1024px) 24vw, 90vw" loading="lazy" />
+            </span>
+            <div class="as-body">
+              <h3 class="display as-name" set:html={brandHtml(s.name)} />
+              <p class="mono as-items">
+                {s.items.map((it) => ITEM_LABEL[it]).join(' · ')}
+                {s.note ? ` — ${s.note}` : ''}
+              </p>
+            </div>
+            <span class="price as-price">{tl(s.price)}</span>
+            <div class="as-cta">
+              <button
+                type="button"
+                class="btn btn--thread"
+                data-quick-add={JSON.stringify({
+                  id: s.id,
+                  name: `${s.name} Hediye Seti`,
+                  meta: s.note ?? 'Hediye seti',
+                  price: s.price,
+                  image: s.thumb,
+                  url: url(`/hediye-setleri/#${s.slug}`),
+                })}
+              >
+                Sepete ekle
+              </button>
+              <a class="mono link-u" href={storeUrl(s.handle)} target="_blank" rel="noopener">
+                Mağazada ↗
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="mono as-note">
+      Setler görsellerde gösterilen ürünlerden oluşur. Renk veya model tercihiniz varsa sipariş öncesi leatherbizon@gmail.com adresine yazabilirsiniz.
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .all-sets {
+    padding-block: clamp(90px, 12vw, 160px);
+  }
+  .as-list {
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+  .as-row {
+    display: grid;
+    grid-template-columns: 3em 180px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: calc(var(--header-h) + 20px);
+  }
+  .as-row:target {
+    background: linear-gradient(90deg, rgb(59 92 255 / 0.12), transparent 70%);
+  }
+  .as-no {
+    color: var(--thread-light);
+  }
+  .as-img {
+    display: block;
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+  }
+  .as-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .as-name {
+    font-size: clamp(1.8rem, 3vw, 3rem);
+    line-height: 0.95;
+  }
+  .as-items {
+    color: var(--mute);
+    margin-top: 8px;
+  }
+  .as-price {
+    font-size: 1.15rem;
+  }
+  .as-cta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .as-cta a {
+    color: var(--mute);
+    text-decoration: none;
+  }
+  .as-note {
+    margin-top: 24px;
+    color: var(--mute);
+    font-size: 0.72rem;
+    max-width: 70ch;
+  }
+  @media (max-width: 900px) {
+    .as-row {
+      grid-template-columns: 110px minmax(0, 1fr);
+      grid-template-areas: 'img body' 'img price' 'cta cta';
+      gap: 8px 16px;
+    }
+    .as-no {
+      display: none;
+    }
+    .as-img {
+      grid-area: img;
+    }
+    .as-body {
+      grid-area: body;
+    }
+    .as-price {
+      grid-area: price;
+    }
+    .as-cta {
+      grid-area: cta;
+      margin-top: 8px;
+    }
+  }
+</style>
